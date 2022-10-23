@@ -13,4 +13,12 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Managers\" />
+    <Folder Include="Interfaces\" />
+    <Folder Include="Accessors\" />
+    <Folder Include="Models\DTOs\" />
+    <Folder Include="Enums\" />
+  </ItemGroup>
+
 </Project>
