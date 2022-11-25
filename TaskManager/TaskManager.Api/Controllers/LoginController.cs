@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using TaskManager.Api.Enums;
 using TaskManager.Api.Managers.Interfaces;
 using TaskManager.Api.Models;
+using TaskManager.Api.Models.DTOs;
 
 namespace TaskManager.Api.Controllers
 {
@@ -10,9 +12,12 @@ namespace TaskManager.Api.Controllers
     public class LoginController : ControllerBase
     {
         private readonly IAccountManager _accountManager;
-        public LoginController(IAccountManager accountManager)
+        private readonly ILogger<LoginController> _logger;
+
+        public LoginController(ILogger<LoginController> logger, IAccountManager accountManager)
         {
             _accountManager = accountManager;
+            _logger = logger;
         }
 
         [HttpPost("Login")]
@@ -25,7 +30,8 @@ namespace TaskManager.Api.Controllers
             }
             catch (Exception ex)
             {
-                return NotFound("User not found");
+                _logger.LogError(ex.Message, ex);
+                return BadRequest(ResponseFormater.Error(ErrorCodes.InternalServerException));
             }
         }
     }

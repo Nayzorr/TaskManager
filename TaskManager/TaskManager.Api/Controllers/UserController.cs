@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using TaskManager.Api.Enums;
 using TaskManager.Api.Managers.Interfaces;
+using TaskManager.Api.Models.DTOs;
 
 namespace TaskManager.Api.Controllers
 {
@@ -28,12 +30,12 @@ namespace TaskManager.Api.Controllers
                     var userData = await _accountManager.GetUserById(userId);
                     return Ok(userData);
                 }
-
-                return NotFound("User not authorized");
+                
+                return BadRequest(ResponseFormater.Error(ErrorCodes.EntityNotFound));
             }
             catch (Exception ex)
             {
-                return NotFound("User not authorized");
+                return BadRequest(ResponseFormater.Error(ErrorCodes.InternalServerException));
             }
         }
     }

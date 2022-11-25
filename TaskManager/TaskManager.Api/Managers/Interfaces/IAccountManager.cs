@@ -5,7 +5,7 @@ namespace TaskManager.Api.Managers.Interfaces
 {
     public interface IAccountManager
     {
-        Task<string> Authentificate(UserLogin userLogin);
-        Task<UserDTO> GetUserById(int userId);
+        Task<ResponseDTO<string>> Authentificate(UserLogin userLogin);
+        Task<ResponseDTO<UserDTO>> GetUserById(int userId);
     }
 }
