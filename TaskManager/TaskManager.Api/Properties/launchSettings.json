@@ -32,7 +32,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development",
         "JWT_KEY": "4bxU6UoMWlZq2TYgm91F",
         "TOKEN_LIFE_TIME_IN_MINUTES": "60",
-        "DB_CONNECTION_STRING": "ffffffffffff",
+        "DB_CONNECTION_STRING": "fffffffffffff",
         "JWT_ISSUER": "https://localhost:44312/",
         "JWT_AUDIENCER": "https://localhost:44312/"
       },
