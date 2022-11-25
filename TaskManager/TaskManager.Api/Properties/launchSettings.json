@@ -17,7 +17,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development",
         "JWT_KEY": "4bxU6UoMWlZq2TYgm91F",
         "TOKEN_LIFE_TIME_IN_MINUTES": "60",
-        "DB_CONNECTION_STRING": "Server=taskmanager.czgrlmoeowln.us-east-1.rds.amazonaws.com;Database=taskmanager;UID=admin;PWD=Nazarii123;MultisubnetFailover=true;",
+        "DB_CONNECTION_STRING": "test",
         "JWT_ISSUER": "https://localhost:44312/",
         "JWT_AUDIENCER": "https://localhost:44312/"
       },
