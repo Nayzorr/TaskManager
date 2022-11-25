@@ -11,6 +11,9 @@ using Module = TaskManager.Api.Module;
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 

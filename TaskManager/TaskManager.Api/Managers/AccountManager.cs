@@ -18,7 +18,7 @@ namespace TaskManager.Api.Managers
             _mapper = mapper;
         }
 
-        public async Task<string> Authentificate(UserLogin userLogin)
+        public async Task<ResponseDTO<string>> Authentificate(UserLogin userLogin)
         {
             var currentUser = await _dbAccessor.GetUserByCredentionalsAsync(userLogin);
 
@@ -29,10 +29,10 @@ namespace TaskManager.Api.Managers
 
             var token = AccountHelper.GenerateToken(currentUser);
 
-            return token;
+            return ResponseFormater.OK(token);
         }
 
-        public async Task<UserDTO> GetUserById(int userId)
+        public async Task<ResponseDTO<UserDTO>> GetUserById(int userId)
         {
             var dbUser = await _dbAccessor.GetUserById(userId);
 
@@ -43,7 +43,7 @@ namespace TaskManager.Api.Managers
 
             var mappedUser = _mapper.Map<UserDTO>(dbUser);
 
-            return mappedUser;
+            return ResponseFormater.OK(mappedUser);
         }
     }
 }
