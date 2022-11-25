@@ -14,10 +14,14 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        //HERE WILL BE ENV VARIABLES
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "JWT_KEY": "4bxU6UoMWlZq2TYgm91F",
+        "TOKEN_LIFE_TIME_IN_MINUTES": "60",
+        "DB_CONNECTION_STRING": "Server=taskmanager.czgrlmoeowln.us-east-1.rds.amazonaws.com;Database=taskmanager;UID=admin;PWD=Nazarii123;MultisubnetFailover=true;",
+        "JWT_ISSUER": "https://localhost:44312/",
+        "JWT_AUDIENCER": "https://localhost:44312/"
       },
-      "applicationUrl": "https://localhost:7038;http://localhost:5038",
+      "applicationUrl": "http://localhost:7038;http://localhost:5038",
       "dotnetRunMessages": true
     },
     "IIS Express": {
@@ -25,15 +29,20 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "JWT_KEY": "4bxU6UoMWlZq2TYgm91F",
+        "TOKEN_LIFE_TIME_IN_MINUTES": "60",
+        "DB_CONNECTION_STRING": "Server=taskmanager.czgrlmoeowln.us-east-1.rds.amazonaws.com;Database=taskmanager;UID=admin;PWD=Nazarii123;MultisubnetFailover=true;",
+        "JWT_ISSUER": "https://localhost:44312/",
+        "JWT_AUDIENCER": "https://localhost:44312/"
+      },
+      "Docker": {
+        "commandName": "Docker",
+        "launchBrowser": true,
+        "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
+        "publishAllPorts": true,
+        "useSSL": true
       }
-    },
-    "Docker": {
-      "commandName": "Docker",
-      "launchBrowser": true,
-      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
-      "publishAllPorts": true,
-      "useSSL": true
     }
   }
 }
