@@ -11,6 +11,7 @@ namespace TaskManager.Api
         public static readonly string DbConnectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
         public static readonly string SwaggerEndpointUrl = "/swagger/v1/swagger.json";
         public static readonly string SwaggerEndpointTitle = "Task Manager API V1";
+        public static readonly string Cors = Environment.GetEnvironmentVariable("CORS");
 
         public static T ParseEnvironmentVariable<T>(string envName, T defaultValue) where T : IConvertible
         {

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Avatar,
   Checkbox,
@@ -15,6 +15,8 @@ import {
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import styles from "./Login.module.css";
+import API from "../../api/axios";
+import { AUTHENTICATE } from "../../api/url";
 
 const theme = createTheme({
   components: {
@@ -55,6 +57,28 @@ const theme = createTheme({
 });
 
 export default function Login() {
+  const [userLogin, setUserLogin] = useState({
+    userName: "",
+    password: "",
+  });
+  const [isCorrectUser, setIsCorrectUser] = useState(false);
+
+  const login = () => {
+    let user = API.post(AUTHENTICATE, {
+      userName: userLogin.userName,
+      password: userLogin.password,
+    })
+      .then((response) => {
+        console.log(response.data.data);
+        setIsCorrectUser(false);
+      })
+      .catch((erorr) => {
+        if (erorr.response.status == 400) {
+          setIsCorrectUser(true);
+        }
+      });
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <Grid container component="main">
@@ -70,6 +94,7 @@ export default function Login() {
             </Typography>
             <form className={styles.form} noValidate>
               <TextField
+                error={isCorrectUser}
                 variant="outlined"
                 margin="normal"
                 required
@@ -79,8 +104,12 @@ export default function Login() {
                 name="email"
                 autoComplete="email"
                 autoFocus
+                onChange={(e) =>
+                  setUserLogin({ ...userLogin, userName: e.target.value })
+                }
               />
               <TextField
+                error={isCorrectUser}
                 variant="outlined"
                 margin="normal"
                 required
@@ -90,16 +119,20 @@ export default function Login() {
                 type="password"
                 id="password"
                 autoComplete="current-password"
+                onChange={(e) =>
+                  setUserLogin({ ...userLogin, password: e.target.value })
+                }
               />
               <FormControlLabel
                 control={<Checkbox value="remember" color="primary" />}
                 label="Remember me"
               />
               <Button
-                type="submit"
+                //type="submit"
                 fullWidth
                 variant="contained"
                 color="primary"
+                onClick={login}
               >
                 Sign In
               </Button>

@@ -17,9 +17,10 @@
         "ASPNETCORE_ENVIRONMENT": "Development",
         "JWT_KEY": "4bxU6UoMWlZq2TYgm91F",
         "TOKEN_LIFE_TIME_IN_MINUTES": "60",
-        "DB_CONNECTION_STRING": "test",
+        "DB_CONNECTION_STRING": "Server=taskmanager.czgrlmoeowln.us-east-1.rds.amazonaws.com;Database=taskmanager;UID=admin;PWD=Nazarii123;MultisubnetFailover=true;",
         "JWT_ISSUER": "https://localhost:44312/",
-        "JWT_AUDIENCER": "https://localhost:44312/"
+        "JWT_AUDIENCER": "https://localhost:44312/",
+        "CORS": "http://localhost:3000"
       },
       "applicationUrl": "http://localhost:7038;http://localhost:5038",
       "dotnetRunMessages": true

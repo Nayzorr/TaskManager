@@ -68,6 +68,17 @@ builder.Services
       c.AddEnumsWithValuesFixFilters();
   });
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(builder =>
+    {
+        builder.WithOrigins(EnvironmentVariables.Cors)
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials();
+    });
+});
+
 var app = builder.Build();
 
 var basePath = Environment.GetEnvironmentVariable("SERVICE_BASE_PATH")?.Insert(0, "/") ?? "/taskmanagerapi";
@@ -84,6 +95,8 @@ app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint($"{basePath}{EnvironmentVariables.SwaggerEndpointUrl}", EnvironmentVariables.SwaggerEndpointTitle);
 });
+
+app.UseCors();
 
 app.UseAuthentication();
 
