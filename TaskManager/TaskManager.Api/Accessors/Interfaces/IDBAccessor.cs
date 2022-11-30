@@ -8,5 +8,6 @@ namespace TaskManager.Api.Accessors.Interfaces
         Task<User> GetUserByCredentionalsAsync(UserLogin userLogin);
         Task<User> GetUserById(int userId);
         Task<bool> Register(User mappedUser);
+        Task<bool> ChangeUserPassword(UserLogin userChangePasswordDto);
     }
 }

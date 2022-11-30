@@ -8,5 +8,6 @@ namespace TaskManager.Api.Managers.Interfaces
         Task<ResponseDTO<string>> Authentificate(UserLogin userLogin);
         Task<ResponseDTO<UserDTO>> GetUserById(int userId);
         Task<ResponseDTO<bool>> Register(UserDTO userDto);
+        Task<ResponseDTO<bool>> ChangeUserPassword(UserLogin userLogin);
     }
 }

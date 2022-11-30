@@ -14,6 +14,24 @@ namespace TaskManager.Api.Accessors
             _rapaportConnectionString = rapaportConnectionString;
         }
 
+        public async Task<bool> ChangeUserPassword(UserLogin userChangePasswordDto)
+        {
+            using var context = new TaskManagerContext(_rapaportConnectionString);
+
+            var currentUser = await context.Users.SingleOrDefaultAsync(o => o.UserName == userChangePasswordDto.UserName);
+
+            if (currentUser == null)
+            {
+                throw new Exception("Username '" + userChangePasswordDto.UserName + "' not found");
+            }
+
+            currentUser.PasswordHash = BC.HashPassword(userChangePasswordDto.Password);
+            context.Users.Update(currentUser);
+            await context.SaveChangesAsync();
+
+            return true;
+        }
+
         public async Task<User> GetUserByCredentionalsAsync(UserLogin userLogin)
         {
             using var context = new TaskManagerContext(_rapaportConnectionString);
