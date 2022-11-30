@@ -29,6 +29,12 @@ namespace TaskManager.Api.Managers
             return ResponseFormater.OK(token);
         }
 
+        public async Task<ResponseDTO<bool>> ChangeUserPassword(UserLogin userChangePasswordDto)
+        {
+            var result = await _dbAccessor.ChangeUserPassword(userChangePasswordDto);
+            return ResponseFormater.OK(result);
+        }
+
         public async Task<ResponseDTO<UserDTO>> GetUserById(int userId)
         {
             var dbUser = await _dbAccessor.GetUserById(userId);
