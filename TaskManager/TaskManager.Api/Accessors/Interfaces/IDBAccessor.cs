@@ -1,5 +1,6 @@
 ﻿using TaskManager.Api.DO;
-using TaskManager.Api.Models;
+using TaskManager.Api.Enums;
+using TaskManager.Api.Models.DTOs;
 
 namespace TaskManager.Api.Accessors.Interfaces
 {
@@ -9,5 +10,7 @@ namespace TaskManager.Api.Accessors.Interfaces
         Task<User> GetUserById(int userId);
         Task<bool> Register(User mappedUser);
         Task<bool> ChangeUserPassword(UserLogin userChangePasswordDto);
+        Task<User> GetUserByUserName(string userName);
+        Task<bool> ChangeFriendStatus(int currentUserId, int userIdToChangeStatus, FriendStatusEnum friendStatus);
     }
 }

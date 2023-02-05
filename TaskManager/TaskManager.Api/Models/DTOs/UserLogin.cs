@@ -1,4 +1,4 @@
-﻿namespace TaskManager.Api.Models
+﻿namespace TaskManager.Api.Models.DTOs
 {
     public class UserLogin
     {

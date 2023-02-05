@@ -1,7 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TaskManager.Api.Accessors.Interfaces;
 using TaskManager.Api.DO;
-using TaskManager.Api.Models;
+using TaskManager.Api.Enums;
+using TaskManager.Api.Models.DTOs;
 using BC = BCrypt.Net.BCrypt;
 
 namespace TaskManager.Api.Accessors
@@ -12,6 +13,19 @@ namespace TaskManager.Api.Accessors
         public DBAccessor(string rapaportConnectionString)
         {
             _rapaportConnectionString = rapaportConnectionString;
+        }
+
+        public async Task<bool> ChangeFriendStatus(int currentUserId, int userIdToChangeStatus, FriendStatusEnum friendStatus)
+        {
+            using var context = new TaskManagerContext(_rapaportConnectionString);
+
+            await context.Friends.AddAsync(new Friend() {
+                UserFirstId = currentUserId, 
+                UserSecondId = userIdToChangeStatus, 
+                FriendStatusId = (int)friendStatus 
+            });
+
+            return true;
         }
 
         public async Task<bool> ChangeUserPassword(UserLogin userChangePasswordDto)
@@ -50,8 +64,16 @@ namespace TaskManager.Api.Accessors
         {
             using var context = new TaskManagerContext(_rapaportConnectionString);
 
-            //TOOD: add password hashing
             var currentUser = await context.Users.SingleOrDefaultAsync(o => o.Id == userId);
+
+            return currentUser;
+        }
+
+        public async Task<User> GetUserByUserName(string userName)
+        {
+            using var context = new TaskManagerContext(_rapaportConnectionString);
+
+            var currentUser = await context.Users.SingleOrDefaultAsync(o => o.UserName == userName);
 
             return currentUser;
         }

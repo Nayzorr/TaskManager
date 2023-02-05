@@ -3,7 +3,6 @@ using TaskManager.Api.Accessors.Interfaces;
 using TaskManager.Api.DO;
 using TaskManager.Api.Helpers;
 using TaskManager.Api.Managers.Interfaces;
-using TaskManager.Api.Models;
 using TaskManager.Api.Models.DTOs;
 using BC = BCrypt.Net.BCrypt;
 
@@ -18,6 +17,20 @@ namespace TaskManager.Api.Managers
         {
             _dbAccessor = dBAccessor;
             _mapper = mapper;
+        }
+
+        public async Task<ResponseDTO<bool>> ChangeFriendStatus(int currentUserId, UserFriendDTO userFriendDTO)
+        {
+            var userToToChangeStatus = await _dbAccessor.GetUserByUserName(userFriendDTO.UserNameToChangeStatus);
+
+            if (userToToChangeStatus == null)
+            {
+                throw new NullReferenceException($"User {userToToChangeStatus} not found");
+            }
+
+            var result = await _dbAccessor.ChangeFriendStatus(currentUserId, userToToChangeStatus.Id, userFriendDTO.FriendStatus);
+
+            return ResponseFormater.OK(result);
         }
 
         public async Task<ResponseDTO<string>> Authentificate(UserLogin userLogin)

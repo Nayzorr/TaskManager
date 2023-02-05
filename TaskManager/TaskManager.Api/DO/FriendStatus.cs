@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace TaskManager.Api.DO
+﻿namespace TaskManager.Api.DO
 {
     public partial class FriendStatus
     {
