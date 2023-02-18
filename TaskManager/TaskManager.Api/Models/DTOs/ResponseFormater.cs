@@ -24,6 +24,16 @@ namespace TaskManager.Api.Models.DTOs
 
             return response;
         }
+
+        public static ResponseDTO<Exception> Error(Exception ex, ErrorCodes statusCode)
+        {
+            var response = new ResponseDTO<Exception>
+            {
+                Error = new ErrorDTO(ex, statusCode),
+            };
+
+            return response;
+        }
     }
 
 }

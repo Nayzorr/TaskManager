@@ -7,11 +7,16 @@ namespace TaskManager.Api.Accessors.Interfaces
     public interface IDBAccessor
     {
         Task<User> GetUserByCredentionalsAsync(UserLogin userLogin);
-        Task<User> GetUserById(int userId);
-        Task<bool> Register(User mappedUser);
-        Task<bool> ChangeUserPassword(UserLogin userChangePasswordDto);
-        Task<User> GetUserByUserName(string userName);
-        Task<bool> ChangeFriendStatus(int currentUserId, int userIdToChangeStatus, FriendStatusEnum friendStatus);
-        Task<bool> CreateTeam(Team teamToCreate);
+        Task<User> GetUserByIdAsync(int userId);
+        Task<bool> RegisterAsync(User mappedUser);
+        Task<bool> ChangeUserPasswordAsync(UserLogin userChangePasswordDto);
+        Task<User> GetUserByUserNameAsync(string userName);
+        Task<bool> ChangeFriendStatusAsync(int currentUserId, int userIdToChangeStatus, FriendStatusEnum friendStatus);
+        Task<bool> CreateTeamAsync(Team teamToCreate);
+        Task<bool> CheckIfTeamNameUniqueAsync(CreateTeamDTO teamDto);
+        Task<bool> InvitePersonToTeamAsync(int inviterId, int teamId, string personToIviteUserName);
+        Task<Team> GetTeamMainInfoByNameAsync(string teamName);
+        Task<bool> AddUserToTheTeamAsync(int teamCreatorId, int userToAddId);
+        Task<List<User>> GetTeamMembertsByIdAsync(int teamId);
     }
 }

@@ -58,7 +58,7 @@ namespace TaskManager.Api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message, ex);
-                return BadRequest(ResponseFormater.Error(ErrorCodes.InternalServerException));
+                return BadRequest(ResponseFormater.Error(ex, ErrorCodes.InternalServerException));
             }
         }
 
@@ -86,7 +86,7 @@ namespace TaskManager.Api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message, ex);
-                return BadRequest(ResponseFormater.Error(ErrorCodes.InternalServerException));
+                return BadRequest(ResponseFormater.Error(ex, ErrorCodes.InternalServerException));
             }
         }
     }

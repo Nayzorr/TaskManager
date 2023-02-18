@@ -21,14 +21,14 @@ namespace TaskManager.Api.Managers
 
         public async Task<ResponseDTO<bool>> ChangeFriendStatus(int currentUserId, UserFriendDTO userFriendDTO)
         {
-            var userToToChangeStatus = await _dbAccessor.GetUserByUserName(userFriendDTO.UserNameToChangeStatus);
+            var userToToChangeStatus = await _dbAccessor.GetUserByUserNameAsync(userFriendDTO.UserNameToChangeStatus);
 
             if (userToToChangeStatus == null)
             {
                 throw new NullReferenceException($"User {userToToChangeStatus} not found");
             }
 
-            var result = await _dbAccessor.ChangeFriendStatus(currentUserId, userToToChangeStatus.Id, userFriendDTO.FriendStatus);
+            var result = await _dbAccessor.ChangeFriendStatusAsync(currentUserId, userToToChangeStatus.Id, userFriendDTO.FriendStatus);
 
             return ResponseFormater.OK(result);
         }
@@ -44,13 +44,13 @@ namespace TaskManager.Api.Managers
 
         public async Task<ResponseDTO<bool>> ChangeUserPassword(UserLogin userChangePasswordDto)
         {
-            var result = await _dbAccessor.ChangeUserPassword(userChangePasswordDto);
+            var result = await _dbAccessor.ChangeUserPasswordAsync(userChangePasswordDto);
             return ResponseFormater.OK(result);
         }
 
         public async Task<ResponseDTO<UserDTO>> GetUserById(int userId)
         {
-            var dbUser = await _dbAccessor.GetUserById(userId);
+            var dbUser = await _dbAccessor.GetUserByIdAsync(userId);
 
             if (dbUser == null)
             {
@@ -68,7 +68,7 @@ namespace TaskManager.Api.Managers
 
             mappedUser.PasswordHash = BC.HashPassword(userDto.Password);
 
-            var result = await _dbAccessor.Register(mappedUser);
+            var result = await _dbAccessor.RegisterAsync(mappedUser);
 
             return ResponseFormater.OK(result);
         }

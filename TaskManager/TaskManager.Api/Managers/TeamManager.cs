@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using TaskManager.Api.Accessors.Interfaces;
 using TaskManager.Api.DO;
 using TaskManager.Api.Managers.Interfaces;
@@ -17,6 +18,18 @@ namespace TaskManager.Api.Managers
             _mapper = mapper;
         }
 
+        public async Task<ResponseDTO<bool>> AddUserToTheTeam(int teamCreatorId, int userToAddId)
+        {
+            var result = await _dbAccessor.AddUserToTheTeamAsync(teamCreatorId, userToAddId);
+            return ResponseFormater.OK(result);
+        }
+
+        public async Task<ResponseDTO<bool>> CheckIfTeamNameUnique(CreateTeamDTO teamDto)
+        {
+            var result = await _dbAccessor.CheckIfTeamNameUniqueAsync(teamDto);
+            return ResponseFormater.OK(result);
+        }
+
         public async Task<ResponseDTO<bool>> CreateTeam(int userId, CreateTeamDTO createTeamDTO)
         {
 
@@ -27,9 +40,33 @@ namespace TaskManager.Api.Managers
                 DateCreated = DateTime.Now,
             };
 
-            var result = await _dbAccessor.CreateTeam(teamToCreate);
+            var result = await _dbAccessor.CreateTeamAsync(teamToCreate);
 
             return ResponseFormater.OK(result);
+        }
+
+        public async Task<ResponseDTO<TeamInfoDTO>> GetTeamMainInfoByName(string teamName)
+        {
+            var result = await _dbAccessor.GetTeamMainInfoByNameAsync(teamName);
+
+            var mappedTeam = _mapper.Map<TeamInfoDTO>(result);
+
+            var teamMembers = await _dbAccessor.GetTeamMembertsByIdAsync(mappedTeam.Id);
+
+            var mappedTeamMembers = _mapper.Map<List<UserDTO>>(teamMembers);
+
+            mappedTeam.TeamMembers = mappedTeamMembers;
+
+            return ResponseFormater.OK(mappedTeam);
+        }
+
+        public async Task<ResponseDTO<bool>> InvitePersonToTeam(int inviterId, int teamId, string personToInviteUserName)
+        {
+            var result = await _dbAccessor.InvitePersonToTeamAsync(inviterId, teamId, personToInviteUserName);
+
+            //TODO: Add email invitation in future here
+            return ResponseFormater.OK(result);
+
         }
     }
 }

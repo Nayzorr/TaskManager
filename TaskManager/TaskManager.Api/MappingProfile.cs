@@ -9,6 +9,7 @@ namespace TaskManager.Api
         public MappingProfile()
         {
             CreateMap<User, UserDTO>().ReverseMap();
+            CreateMap<Team, TeamInfoDTO>().ReverseMap();
         }
     }
 }

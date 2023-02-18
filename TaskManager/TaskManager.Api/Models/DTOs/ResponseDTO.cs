@@ -24,5 +24,11 @@ namespace TaskManager.Api.Models.DTOs
             ErrorCode = (int)Error;
             ErrorMessage = EnumHelper.GetDescription(Error);
         }
+
+        public ErrorDTO(Exception exception, ErrorCodes Error)
+        {
+            ErrorCode = (int)Error;
+            ErrorMessage = exception.Message;
+        }
     }
 }

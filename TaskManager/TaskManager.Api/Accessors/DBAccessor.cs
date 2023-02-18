@@ -15,20 +15,60 @@ namespace TaskManager.Api.Accessors
             _rapaportConnectionString = rapaportConnectionString;
         }
 
-        public async Task<bool> ChangeFriendStatus(int currentUserId, int userIdToChangeStatus, FriendStatusEnum friendStatus)
+        public async Task<bool> AddUserToTheTeamAsync(int teamCreatorId, int userToAddId)
         {
             using var context = new TaskManagerContext(_rapaportConnectionString);
 
-            await context.Friends.AddAsync(new Friend() {
-                UserFirstId = currentUserId, 
-                UserSecondId = userIdToChangeStatus, 
-                FriendStatusId = (int)friendStatus 
+            var IsAcceptorTeamCreator = await context.Teams.SingleOrDefaultAsync(o => o.CreatorId == teamCreatorId);
+
+            if (IsAcceptorTeamCreator is null)
+            {
+                throw new Exception("Acceptor is not team creator, cannot to accept user to the team");
+            }
+
+            var userInvitation = await context.TeamInvitations.SingleOrDefaultAsync(x => x.UserToInviteId == userToAddId);
+
+            if (userInvitation is null)
+            {
+                throw new Exception("User doesn't exists Has no invtitation to Team, cannot add without invitation");
+            }
+
+            using var transaction = context.Database.BeginTransaction();
+
+            try
+            {
+                //remove from team invitation table + add to team
+                context.Remove(userInvitation);
+                await context.UserTeams.AddAsync(new UserTeam() { TeamId = userInvitation.TeamId, UserId = userInvitation.UserToInviteId });
+                await context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                throw;
+            }
+        }
+
+        public async Task<bool> ChangeFriendStatusAsync(int currentUserId, int userIdToChangeStatus, FriendStatusEnum friendStatus)
+        {
+            using var context = new TaskManagerContext(_rapaportConnectionString);
+
+            await context.Friends.AddAsync(new Friend()
+            {
+                UserFirstId = currentUserId,
+                UserSecondId = userIdToChangeStatus,
+                FriendStatusId = (int)friendStatus
             });
+
+            await context.SaveChangesAsync();
 
             return true;
         }
 
-        public async Task<bool> ChangeUserPassword(UserLogin userChangePasswordDto)
+        public async Task<bool> ChangeUserPasswordAsync(UserLogin userChangePasswordDto)
         {
             using var context = new TaskManagerContext(_rapaportConnectionString);
 
@@ -46,12 +86,52 @@ namespace TaskManager.Api.Accessors
             return true;
         }
 
-        public async Task<bool> CreateTeam(Team teamToCreate)
+        public async Task<bool> CheckIfTeamNameUniqueAsync(CreateTeamDTO teamDto)
         {
             using var context = new TaskManagerContext(_rapaportConnectionString);
+
+            var result = await context.Teams.AnyAsync(x => x.TeamName == teamDto.TeamName);
+
+            return !result;
+        }
+
+        public async Task<bool> CreateTeamAsync(Team teamToCreate)
+        {
+            using var context = new TaskManagerContext(_rapaportConnectionString);
+
+            if (context.Teams.Any(x => x.TeamName == teamToCreate.TeamName))
+            {
+                throw new Exception("Team Name '" + teamToCreate.TeamName + "' is already taken");
+            }
+
             await context.Teams.AddAsync(teamToCreate);
             await context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<Team> GetTeamMainInfoByNameAsync(string teamName)
+        {
+            using var context = new TaskManagerContext(_rapaportConnectionString);
+
+            //TODO verify It after at least one user will be in team
+            var team = await context.Teams.AsNoTracking()
+                .SingleOrDefaultAsync(o => o.TeamName == teamName);
+
+            if (team is null)
+            {
+                throw new Exception("Person To Invite not found");
+            }
+
+            return team;
+        }
+
+        public async Task<List<User>> GetTeamMembertsByIdAsync(int teamId)
+        {
+            using var context = new TaskManagerContext(_rapaportConnectionString);
+
+            return await context.Users
+                .Where(u => context.UserTeams.Where(ut => ut.TeamId == teamId)
+                .Select(e => e.UserId).Contains(u.Id)).ToListAsync();
         }
 
         public async Task<User> GetUserByCredentionalsAsync(UserLogin userLogin)
@@ -68,7 +148,7 @@ namespace TaskManager.Api.Accessors
             return currentUser;
         }
 
-        public async Task<User> GetUserById(int userId)
+        public async Task<User> GetUserByIdAsync(int userId)
         {
             using var context = new TaskManagerContext(_rapaportConnectionString);
 
@@ -77,7 +157,7 @@ namespace TaskManager.Api.Accessors
             return currentUser;
         }
 
-        public async Task<User> GetUserByUserName(string userName)
+        public async Task<User> GetUserByUserNameAsync(string userName)
         {
             using var context = new TaskManagerContext(_rapaportConnectionString);
 
@@ -86,7 +166,41 @@ namespace TaskManager.Api.Accessors
             return currentUser;
         }
 
-        public async Task<bool> Register(User mappedUser)
+        public async Task<bool> InvitePersonToTeamAsync(int inviterId, int teamId, string personToInviteUserName)
+        {
+            using var context = new TaskManagerContext(_rapaportConnectionString);
+
+            var IsInviterTeamCreator = await context.Teams.SingleOrDefaultAsync(o => o.CreatorId == inviterId);
+
+            if (IsInviterTeamCreator is null)
+            {
+                throw new Exception("Inviter is not team creator, cannot to invite user");
+            }
+
+            var personToInvite = await context.Users.SingleOrDefaultAsync(o => o.UserName == personToInviteUserName);
+
+            if (personToInvite is null)
+            {
+                throw new Exception("Person To Invite not found");
+            }
+
+            if (context.UserTeams.Any(x => x.TeamId == teamId && x.UserId == personToInvite.Id))
+            {
+                throw new Exception("User already in this team '");
+            }
+
+            await context.TeamInvitations.AddAsync(new TeamInvitation
+            {
+                InviterId = inviterId,
+                TeamId = teamId,
+                UserToInviteId = personToInvite.Id
+            });
+
+            await context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> RegisterAsync(User mappedUser)
         {
             using var context = new TaskManagerContext(_rapaportConnectionString);
 
