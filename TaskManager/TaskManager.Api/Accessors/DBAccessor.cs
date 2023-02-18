@@ -46,6 +46,14 @@ namespace TaskManager.Api.Accessors
             return true;
         }
 
+        public async Task<bool> CreateTeam(Team teamToCreate)
+        {
+            using var context = new TaskManagerContext(_rapaportConnectionString);
+            await context.Teams.AddAsync(teamToCreate);
+            await context.SaveChangesAsync();
+            return true;
+        }
+
         public async Task<User> GetUserByCredentionalsAsync(UserLogin userLogin)
         {
             using var context = new TaskManagerContext(_rapaportConnectionString);

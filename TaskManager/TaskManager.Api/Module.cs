@@ -11,6 +11,7 @@ namespace TaskManager.Api
         protected override void Load(ContainerBuilder builder)
         {
             builder.RegisterType<AccountManager>().As<IAccountManager>();
+            builder.RegisterType<AccountManager>().As<ITeamManager>();
             builder.RegisterType<DBAccessor>().As<IDBAccessor>()
                 .WithParameter("rapaportConnectionString", EnvironmentVariables.DbConnectionString);
         }

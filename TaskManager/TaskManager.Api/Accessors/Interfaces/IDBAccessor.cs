@@ -12,5 +12,6 @@ namespace TaskManager.Api.Accessors.Interfaces
         Task<bool> ChangeUserPassword(UserLogin userChangePasswordDto);
         Task<User> GetUserByUserName(string userName);
         Task<bool> ChangeFriendStatus(int currentUserId, int userIdToChangeStatus, FriendStatusEnum friendStatus);
+        Task<bool> CreateTeam(Team teamToCreate);
     }
 }

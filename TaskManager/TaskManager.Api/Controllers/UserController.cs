@@ -43,7 +43,7 @@ namespace TaskManager.Api.Controllers
 
         [HttpPost("ChangePassword")]
         [Authorize]
-        public async Task<IActionResult> ChangeUserPassword(UserLogin userLogin)
+        public async Task<IActionResult> ChangeUserPassword([FromBody] UserLogin userLogin)
         {
             try
             {

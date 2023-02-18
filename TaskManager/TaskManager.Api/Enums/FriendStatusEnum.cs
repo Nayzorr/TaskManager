@@ -4,5 +4,6 @@
     {
         Pending = 1,
         InFriends = 2,
+        Rejected = 3,
     }
 }
