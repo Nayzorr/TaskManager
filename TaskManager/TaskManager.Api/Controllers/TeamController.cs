@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Sentry;
 using System.Security.Claims;
 using TaskManager.Api.DO;
 using TaskManager.Api.Enums;
@@ -55,6 +56,10 @@ namespace TaskManager.Api.Controllers
             }
             catch (Exception ex)
             {
+                SentrySdk.CaptureException(ex, e =>
+                {
+                    e.Level = SentryLevel.Warning;
+                });
                 return BadRequest(ResponseFormater.Error(ex, ErrorCodes.InternalServerException));
             }
         }

@@ -119,7 +119,7 @@ namespace TaskManager.Api.Accessors
 
             if (team is null)
             {
-                throw new Exception("Person To Invite not found");
+                throw new Exception("Team not found");
             }
 
             return team;
