@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Sentry;
 using System.Security.Claims;
 using TaskManager.Api.Enums;
 using TaskManager.Api.Managers.Interfaces;
@@ -23,14 +24,17 @@ namespace TaskManager.Api.Controllers
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] UserLogin userLogin)
         {
+
             try
             {
+
                 if (!ModelState.IsValid || userLogin is null)
                 {
                     return BadRequest(ResponseFormater.Error(ErrorCodes.InvalidModel));
                 }
 
                 var token = await _accountManager.Authentificate(userLogin);
+
                 return Ok(token);
             }
             catch (Exception ex)
