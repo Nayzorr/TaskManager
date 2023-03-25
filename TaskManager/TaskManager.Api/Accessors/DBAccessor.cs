@@ -56,30 +56,74 @@ namespace TaskManager.Api.Accessors
         {
             using var context = new TaskManagerContext(_rapaportConnectionString);
 
-            await context.Friends.AddAsync(new Friend()
+            var currentState = await context.Friends
+                .SingleOrDefaultAsync(e => (e.UserFirstId == currentUserId && e.UserSecondId == userIdToChangeStatus) ||
+                (e.UserSecondId == currentUserId && e.UserFirstId == userIdToChangeStatus));
+
+            if (currentState is null && friendStatus != FriendStatusEnum.Pending)
             {
-                UserFirstId = currentUserId,
-                UserSecondId = userIdToChangeStatus,
-                FriendStatusId = (int)friendStatus
-            });
+                return false;
+            }
+
+            switch (friendStatus)
+            {
+                case FriendStatusEnum.Pending:
+                    if (currentState is null)
+                    {
+                        await context.Friends.AddAsync(new Friend
+                        {
+                            UserFirstId = currentUserId,
+                            UserSecondId = userIdToChangeStatus,
+                            FriendStatusId = (int)FriendStatusEnum.Pending
+                        });
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                    break;
+
+                case FriendStatusEnum.InFriends:
+                    if (currentState is null)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        currentState.FriendStatusId = (int)FriendStatusEnum.InFriends;
+                        context.Friends.Update(currentState);
+                    }
+                    break;
+
+                case FriendStatusEnum.Rejected:
+                    if (currentState is null)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        context.Friends.Remove(currentState);
+                    }
+                    break;
+            }
 
             await context.SaveChangesAsync();
 
             return true;
         }
 
-        public async Task<bool> ChangeUserPasswordAsync(UserLogin userChangePasswordDto)
+        public async Task<bool> ChangeUserPasswordAsync(int currentUserId, string password)
         {
             using var context = new TaskManagerContext(_rapaportConnectionString);
 
-            var currentUser = await context.Users.SingleOrDefaultAsync(o => o.UserName == userChangePasswordDto.UserName);
+            var currentUser = await context.Users.SingleOrDefaultAsync(o => o.Id == currentUserId);
 
             if (currentUser == null)
             {
-                throw new Exception("Username '" + userChangePasswordDto.UserName + "' not found");
+                throw new Exception("User not found");
             }
 
-            currentUser.PasswordHash = BC.HashPassword(userChangePasswordDto.Password);
+            currentUser.PasswordHash = BC.HashPassword(password);
             context.Users.Update(currentUser);
             await context.SaveChangesAsync();
 
@@ -166,6 +210,20 @@ namespace TaskManager.Api.Accessors
             return currentUser;
         }
 
+        public async Task<List<User>> GetUserFriendsList(int userId)
+        {
+            using var context = new TaskManagerContext(_rapaportConnectionString);
+
+            var friendIds = await context.Friends
+                .Where(fr => fr.FriendStatusId == (int)FriendStatusEnum.InFriends && (fr.UserFirstId == userId || fr.UserSecondId == userId))
+                .Select(fr => fr.UserFirstId == userId ? fr.UserSecondId : fr.UserFirstId)
+                .ToListAsync();
+
+            return await context.Users
+                    .Where(u => friendIds.Contains(u.Id))
+                    .ToListAsync();
+        }
+
         public async Task<bool> InvitePersonToTeamAsync(int inviterId, int teamId, string personToInviteUserName)
         {
             using var context = new TaskManagerContext(_rapaportConnectionString);
@@ -211,6 +269,26 @@ namespace TaskManager.Api.Accessors
 
             await context.Users.AddAsync(mappedUser);
             await context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> СhangeTeamNameAsync(int teamCreatorId, ChangeTeamNameDTO changeTeamNameDTO)
+        {
+            using var context = new TaskManagerContext(_rapaportConnectionString);
+
+            var team = await context.Teams.AsNoTracking()
+               .SingleOrDefaultAsync(o => o.TeamName == changeTeamNameDTO.OldTeamName);
+
+            if (team is null || teamCreatorId != team.CreatorId)
+            {
+                throw new Exception("Team not found or user is not team creator");
+            }
+
+            team.TeamName = changeTeamNameDTO.NewTeamName;
+
+            context.Update(team);
+            await context.SaveChangesAsync();
+
             return true;
         }
     }

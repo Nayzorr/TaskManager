@@ -22,7 +22,7 @@ namespace TaskManager.Api.Controllers
         
         [AllowAnonymous]
         [HttpPost("Register")]
-        public async Task<IActionResult> Register([FromBody] UserDTO userDto)
+        public async Task<IActionResult> Register([FromBody] RegisterUserDTO userDto)
         {
             try
             {

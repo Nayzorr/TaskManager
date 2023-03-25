@@ -1,13 +1,8 @@
 using Autofac;
-using Autofac.Core;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Sentry;
-using System.Data.Common;
-using System.Data.SqlClient;
 using System.Text;
 using TaskManager.Api;
 using Unchase.Swashbuckle.AspNetCore.Extensions.Extensions;
@@ -35,35 +30,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(EnvironmentVariables.JwtKey))
     };
 });
-
-builder.Services.AddSentry();
-builder.WebHost.UseSentry(o =>
-{
-    o.Dsn = "https://2f886863ab564c028709c0104abc6143@o4504724543569920.ingest.sentry.io/4504724554645504";
-    // Set TracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
-    // We recommend adjusting this value in production.
-    o.TracesSampleRate = 1.0;
-    o.SampleRate = 1;
-    o.DisableDiagnosticSourceIntegration();
-    o.DiagnosticLevel = SentryLevel.Debug;
-    o.Debug = true;
-    o.BeforeSend = sentryEvent =>
-    {
-        if (sentryEvent.Exception != null
-          && sentryEvent.Exception.Message.Contains("Some useless exception :)"))
-        {
-            return null; // Don't send this event to Sentry
-        }
-
-        sentryEvent.ServerName = null; // Never send Server Name to Sentry
-        return sentryEvent;
-    };
-
-    o.AddExceptionFilterForType<OperationCanceledException>();
-
-});
-
-SentrySdk.CaptureMessage("Hello Sentry");
 
 builder.Services.AddMvc();
 
@@ -121,8 +87,6 @@ var basePath = Environment.GetEnvironmentVariable("SERVICE_BASE_PATH")?.Insert(0
 app.UsePathBase(basePath);
 
 app.UseRouting();
-
-app.UseSentryTracing();
 
 app.UseHttpsRedirection();
 

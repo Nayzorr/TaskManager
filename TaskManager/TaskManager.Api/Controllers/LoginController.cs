@@ -1,9 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Sentry;
-using System.Security.Claims;
 using TaskManager.Api.Enums;
 using TaskManager.Api.Managers.Interfaces;
-using TaskManager.Api.Models;
 using TaskManager.Api.Models.DTOs;
 
 namespace TaskManager.Api.Controllers

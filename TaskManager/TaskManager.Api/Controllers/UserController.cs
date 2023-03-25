@@ -52,8 +52,15 @@ namespace TaskManager.Api.Controllers
                     return BadRequest(ResponseFormater.Error(ErrorCodes.InvalidModel));
                 }
 
-                var result = await _accountManager.ChangeUserPassword(userLogin);
-                return Ok(result);
+                if (HttpContext.User.Identity is ClaimsIdentity identity)
+                {
+                    int currentUserId = int.Parse(identity?.Claims.FirstOrDefault(e => e.Type == ClaimTypes.NameIdentifier)?.Value);
+                    var result = await _accountManager.ChangeUserPassword(currentUserId, userLogin.Password);
+                    return Ok(result);
+                }
+
+                return BadRequest(ResponseFormater.Error(ErrorCodes.InternalServerException));
+
             }
             catch (Exception ex)
             {
@@ -64,7 +71,7 @@ namespace TaskManager.Api.Controllers
 
         [HttpPost("ChangeFriendStatus")]
         [Authorize]
-        public async Task<IActionResult> ChangeFriendStatus([FromBody] UserFriendDTO userFriendDto)
+        public async Task<IActionResult> ChangeFriendStatus([FromBody] UserFriendStatusDTO userFriendDto)
         {
             try
             {
@@ -87,6 +94,27 @@ namespace TaskManager.Api.Controllers
             {
                 _logger.LogError(ex.Message, ex);
                 return BadRequest(ResponseFormater.Error(ex, ErrorCodes.InternalServerException));
+            }
+        }
+
+        [HttpGet("GetUserFriendsList")]
+        [Authorize]
+        public async Task<IActionResult> GetUserFriendsList()
+        {
+            try
+            {
+                if (HttpContext.User.Identity is ClaimsIdentity identity)
+                {
+                    int userId = int.Parse(identity?.Claims.FirstOrDefault(e => e.Type == ClaimTypes.NameIdentifier)?.Value);
+                    var userFriendsList = await _accountManager.GetUserFriendsList(userId);
+                    return Ok(userFriendsList);
+                }
+
+                return BadRequest(ResponseFormater.Error(ErrorCodes.EntityNotFound));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ResponseFormater.Error(ErrorCodes.InternalServerException));
             }
         }
     }

@@ -19,13 +19,18 @@ namespace TaskManager.Api.Managers
             _mapper = mapper;
         }
 
-        public async Task<ResponseDTO<bool>> ChangeFriendStatus(int currentUserId, UserFriendDTO userFriendDTO)
+        public async Task<ResponseDTO<bool>> ChangeFriendStatus(int currentUserId, UserFriendStatusDTO userFriendDTO)
         {
             var userToToChangeStatus = await _dbAccessor.GetUserByUserNameAsync(userFriendDTO.UserNameToChangeStatus);
 
             if (userToToChangeStatus == null)
             {
                 throw new NullReferenceException($"User {userToToChangeStatus} not found");
+            }
+
+            if (userToToChangeStatus.Id == currentUserId)
+            {
+                throw new ArgumentException($"It's not possible to add to friends yourself");
             }
 
             var result = await _dbAccessor.ChangeFriendStatusAsync(currentUserId, userToToChangeStatus.Id, userFriendDTO.FriendStatus);
@@ -42,13 +47,13 @@ namespace TaskManager.Api.Managers
             return ResponseFormater.OK(token);
         }
 
-        public async Task<ResponseDTO<bool>> ChangeUserPassword(UserLogin userChangePasswordDto)
+        public async Task<ResponseDTO<bool>> ChangeUserPassword(int currentUserId, string password)
         {
-            var result = await _dbAccessor.ChangeUserPasswordAsync(userChangePasswordDto);
+            var result = await _dbAccessor.ChangeUserPasswordAsync(currentUserId, password);
             return ResponseFormater.OK(result);
         }
 
-        public async Task<ResponseDTO<UserDTO>> GetUserById(int userId)
+        public async Task<ResponseDTO<BaseUserDTO>> GetUserById(int userId)
         {
             var dbUser = await _dbAccessor.GetUserByIdAsync(userId);
 
@@ -57,12 +62,12 @@ namespace TaskManager.Api.Managers
                 throw new Exception("User not found");
             }
 
-            var mappedUser = _mapper.Map<UserDTO>(dbUser);
+            var mappedUser = _mapper.Map<BaseUserDTO>(dbUser);
 
             return ResponseFormater.OK(mappedUser);
         }
 
-        public async Task<ResponseDTO<bool>> Register(UserDTO userDto)
+        public async Task<ResponseDTO<bool>> Register(RegisterUserDTO userDto)
         {
             var mappedUser = _mapper.Map<User>(userDto);
 
@@ -71,6 +76,15 @@ namespace TaskManager.Api.Managers
             var result = await _dbAccessor.RegisterAsync(mappedUser);
 
             return ResponseFormater.OK(result);
+        }
+
+        public async Task<ResponseDTO<List<BaseUserDTO>>> GetUserFriendsList(int userId)
+        {
+            var dbUserFriendsList = await _dbAccessor.GetUserFriendsList(userId);
+
+            var mappedUserFriendsList = _mapper.Map<List<BaseUserDTO>>(dbUserFriendsList);
+
+            return ResponseFormater.OK(mappedUserFriendsList);
         }
     }
 }

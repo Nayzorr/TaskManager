@@ -9,7 +9,7 @@ namespace TaskManager.Api.Accessors.Interfaces
         Task<User> GetUserByCredentionalsAsync(UserLogin userLogin);
         Task<User> GetUserByIdAsync(int userId);
         Task<bool> RegisterAsync(User mappedUser);
-        Task<bool> ChangeUserPasswordAsync(UserLogin userChangePasswordDto);
+        Task<bool> ChangeUserPasswordAsync(int currentUserId, string password);
         Task<User> GetUserByUserNameAsync(string userName);
         Task<bool> ChangeFriendStatusAsync(int currentUserId, int userIdToChangeStatus, FriendStatusEnum friendStatus);
         Task<bool> CreateTeamAsync(Team teamToCreate);
@@ -18,5 +18,7 @@ namespace TaskManager.Api.Accessors.Interfaces
         Task<Team> GetTeamMainInfoByNameAsync(string teamName);
         Task<bool> AddUserToTheTeamAsync(int teamCreatorId, int userToAddId);
         Task<List<User>> GetTeamMembertsByIdAsync(int teamId);
+        Task<List<User>> GetUserFriendsList(int userId);
+        Task<bool> СhangeTeamNameAsync(int teamCreatorId, ChangeTeamNameDTO changeTeamNameDTO);
     }
 }

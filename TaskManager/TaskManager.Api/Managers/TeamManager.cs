@@ -53,7 +53,7 @@ namespace TaskManager.Api.Managers
 
             var teamMembers = await _dbAccessor.GetTeamMembertsByIdAsync(mappedTeam.Id);
 
-            var mappedTeamMembers = _mapper.Map<List<UserDTO>>(teamMembers);
+            var mappedTeamMembers = _mapper.Map<List<BaseUserDTO>>(teamMembers);
 
             mappedTeam.TeamMembers = mappedTeamMembers;
 
@@ -67,6 +67,13 @@ namespace TaskManager.Api.Managers
             //TODO: Add email invitation in future here
             return ResponseFormater.OK(result);
 
+        }
+
+        public async Task<ResponseDTO<bool>> СhangeTeamName(int teamCreatorId, ChangeTeamNameDTO changeTeamNameDTO)
+        {
+            var result = await _dbAccessor.СhangeTeamNameAsync(teamCreatorId, changeTeamNameDTO);
+
+            return ResponseFormater.OK(result);
         }
     }
 }

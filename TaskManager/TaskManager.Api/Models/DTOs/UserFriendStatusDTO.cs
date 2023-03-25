@@ -2,7 +2,7 @@
 
 namespace TaskManager.Api.Models.DTOs
 {
-    public class UserFriendDTO
+    public class UserFriendStatusDTO
     {
         public string UserNameToChangeStatus { get; set; }
         public FriendStatusEnum FriendStatus { get; set; }

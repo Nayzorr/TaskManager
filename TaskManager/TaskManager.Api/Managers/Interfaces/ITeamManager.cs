@@ -9,5 +9,6 @@ namespace TaskManager.Api.Managers.Interfaces
         Task<ResponseDTO<bool>> CreateTeam(int userId, CreateTeamDTO createTeamDTO);
         Task<ResponseDTO<TeamInfoDTO>>  GetTeamMainInfoByName(string teamName);
         Task<ResponseDTO<bool>> InvitePersonToTeam(int inviterId, int teamId, string personToInviteUserName);
+        Task<ResponseDTO<bool>> СhangeTeamName(int teamCreatorId, ChangeTeamNameDTO changeTeamNameDTO);
     }
 }
