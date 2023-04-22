@@ -86,5 +86,21 @@ namespace TaskManager.Api.Managers
 
             return ResponseFormater.OK(mappedUserFriendsList);
         }
+
+        public async Task<ResponseDTO<bool>> ChangeUserMainInfo(BaseUserDTO userDto)
+        {
+            var userToChangeInfo = await _dbAccessor.GetUserByIdAsync(userDto.Id);
+
+            if (userToChangeInfo == null)
+            {
+                throw new Exception("User not found");
+            }
+
+            var mappedUser = _mapper.Map(userDto, userToChangeInfo);
+
+            var result = await _dbAccessor.ChangeUserMainInfo(userToChangeInfo);
+
+            return ResponseFormater.OK(result);
+        }
     }
 }

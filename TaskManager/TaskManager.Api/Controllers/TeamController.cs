@@ -14,7 +14,6 @@ namespace TaskManager.Api.Controllers
         private readonly ITeamManager _teamManager;
         private readonly ILogger<TeamController> _logger;
 
-        //TODO: Add Delete/Change Team Name/ Delete User from Team
         public TeamController(ILogger<TeamController> logger, ITeamManager teamManager)
         {
             _teamManager = teamManager;
@@ -116,14 +115,36 @@ namespace TaskManager.Api.Controllers
 
         [HttpPost("AddUserToTheTeam/{userToAddId}")]
         [Authorize]
-        public async Task<IActionResult> AddUserToTheTeam(int userToAddId)
+        public async Task<IActionResult> AddUserToTheTeam(int userToAddId, string teamName)
         {
             try
             {
                 if (HttpContext.User.Identity is ClaimsIdentity identity)
                 {
                     int teamCreatorId = int.Parse(identity?.Claims.FirstOrDefault(e => e.Type == ClaimTypes.NameIdentifier)?.Value);
-                    var userData = await _teamManager.AddUserToTheTeam(teamCreatorId, userToAddId);
+                    var userData = await _teamManager.AddUserToTheTeam(teamCreatorId, userToAddId, teamName);
+                    return Ok(userData);
+                }
+
+                return BadRequest(ResponseFormater.Error(ErrorCodes.EntityNotFound));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ResponseFormater.Error(ex, ErrorCodes.InternalServerException));
+            }
+        }
+
+
+        [HttpPost("DeleteUserFromTheTeam/{userToDeleteId}")]
+        [Authorize]
+        public async Task<IActionResult> DeleteUserFromTheTeam(int userToDeleteId, string teamName)
+        {
+            try
+            {
+                if (HttpContext.User.Identity is ClaimsIdentity identity)
+                {
+                    int teamCreatorId = int.Parse(identity?.Claims.FirstOrDefault(e => e.Type == ClaimTypes.NameIdentifier)?.Value);
+                    var userData = await _teamManager.DeleteUserFromTheTeamAsync(teamCreatorId, userToDeleteId, teamName);
                     return Ok(userData);
                 }
 

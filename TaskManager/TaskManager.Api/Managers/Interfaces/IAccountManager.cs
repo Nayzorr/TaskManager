@@ -10,5 +10,6 @@ namespace TaskManager.Api.Managers.Interfaces
         Task<ResponseDTO<bool>> ChangeUserPassword(int currentUserId, string password);
         Task<ResponseDTO<bool>> ChangeFriendStatus(int currentUserId, UserFriendStatusDTO userFriendDTO);
         Task<ResponseDTO<List<BaseUserDTO>>> GetUserFriendsList(int userId);
+        Task<ResponseDTO<bool>> ChangeUserMainInfo(BaseUserDTO userDTO);
     }
 }

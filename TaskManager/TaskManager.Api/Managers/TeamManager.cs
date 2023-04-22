@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using TaskManager.Api.Accessors.Interfaces;
 using TaskManager.Api.DO;
 using TaskManager.Api.Managers.Interfaces;
@@ -18,9 +17,9 @@ namespace TaskManager.Api.Managers
             _mapper = mapper;
         }
 
-        public async Task<ResponseDTO<bool>> AddUserToTheTeam(int teamCreatorId, int userToAddId)
+        public async Task<ResponseDTO<bool>> AddUserToTheTeam(int teamCreatorId, int userToAddId, string teamName)
         {
-            var result = await _dbAccessor.AddUserToTheTeamAsync(teamCreatorId, userToAddId);
+            var result = await _dbAccessor.AddUserToTheTeamAsync(teamCreatorId, userToAddId, teamName);
             return ResponseFormater.OK(result);
         }
 
@@ -42,6 +41,12 @@ namespace TaskManager.Api.Managers
 
             var result = await _dbAccessor.CreateTeamAsync(teamToCreate);
 
+            return ResponseFormater.OK(result);
+        }
+
+        public async Task<ResponseDTO<bool>> DeleteUserFromTheTeamAsync(int teamCreatorId, int userToDeleteId, string teamName)
+        {
+            var result = await _dbAccessor.DeleteUserFromTheTeamAsync(teamCreatorId, userToDeleteId, teamName);
             return ResponseFormater.OK(result);
         }
 

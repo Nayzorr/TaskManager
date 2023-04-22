@@ -15,22 +15,22 @@ namespace TaskManager.Api.Accessors
             _rapaportConnectionString = rapaportConnectionString;
         }
 
-        public async Task<bool> AddUserToTheTeamAsync(int teamCreatorId, int userToAddId)
+        public async Task<bool> AddUserToTheTeamAsync(int teamCreatorId, int userToAddId, string teamName)
         {
             using var context = new TaskManagerContext(_rapaportConnectionString);
 
-            var IsAcceptorTeamCreator = await context.Teams.SingleOrDefaultAsync(o => o.CreatorId == teamCreatorId);
+            var teamToAddUser = await context.Teams.SingleOrDefaultAsync(o => o.CreatorId == teamCreatorId && o.TeamName == teamName);
 
-            if (IsAcceptorTeamCreator is null)
+            if (teamToAddUser is null)
             {
-                throw new Exception("Acceptor is not team creator, cannot to accept user to the team");
+                throw new Exception("Acceptor is not team creator,or team is not found, cannot to accept user to the team");
             }
 
-            var userInvitation = await context.TeamInvitations.SingleOrDefaultAsync(x => x.UserToInviteId == userToAddId);
+            var userInvitation = await context.TeamInvitations.SingleOrDefaultAsync(x => x.UserToInviteId == userToAddId && x.TeamId == teamToAddUser.Id);
 
             if (userInvitation is null)
             {
-                throw new Exception("User doesn't exists Has no invtitation to Team, cannot add without invitation");
+                throw new Exception("User has no invtitation to Team, cannot add without invitation");
             }
 
             using var transaction = context.Database.BeginTransaction();
@@ -38,8 +38,50 @@ namespace TaskManager.Api.Accessors
             try
             {
                 //remove from team invitation table + add to team
-                context.Remove(userInvitation);
+                context.TeamInvitations.Remove(userInvitation);
                 await context.UserTeams.AddAsync(new UserTeam() { TeamId = userInvitation.TeamId, UserId = userInvitation.UserToInviteId });
+                await context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                throw;
+            }
+        }
+
+        public async Task<bool> DeleteUserFromTheTeamAsync(int teamCreatorId, int userToDeleteId, string teamName)
+        {
+            using var context = new TaskManagerContext(_rapaportConnectionString);
+
+            var teamToDelete = await context.Teams.SingleOrDefaultAsync(o => o.CreatorId == teamCreatorId && o.TeamName == teamName);
+
+            if (teamToDelete is null)
+            {
+                throw new Exception("Acceptor is not team creator, or team not found, cannot delete accept user from the team");
+            }
+
+            var personToDelete = await context.Users.SingleOrDefaultAsync(o => o.Id == userToDeleteId);
+
+            if (personToDelete is null)
+            {
+                throw new Exception("Person To Delete not found");
+            }
+
+            var userTeam = await context.UserTeams.SingleOrDefaultAsync(o => o.TeamId == teamToDelete.Id && o.UserId == userToDeleteId);
+
+            if (userTeam is null)
+            {
+                throw new Exception("Team and User relationship not found, cannot to delete user from the team");
+            }
+
+            using var transaction = context.Database.BeginTransaction();
+
+            try
+            {
+                context.UserTeams.Remove(userTeam);
                 await context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
@@ -289,6 +331,15 @@ namespace TaskManager.Api.Accessors
             context.Update(team);
             await context.SaveChangesAsync();
 
+            return true;
+        }
+
+        public async Task<bool> ChangeUserMainInfo(User mappedUser)
+        {
+            using var context = new TaskManagerContext(_rapaportConnectionString);
+    
+            context.Users.Update(mappedUser);
+            await context.SaveChangesAsync();
             return true;
         }
     }

@@ -16,9 +16,11 @@ namespace TaskManager.Api.Accessors.Interfaces
         Task<bool> CheckIfTeamNameUniqueAsync(CreateTeamDTO teamDto);
         Task<bool> InvitePersonToTeamAsync(int inviterId, int teamId, string personToIviteUserName);
         Task<Team> GetTeamMainInfoByNameAsync(string teamName);
-        Task<bool> AddUserToTheTeamAsync(int teamCreatorId, int userToAddId);
+        Task<bool> AddUserToTheTeamAsync(int teamCreatorId, int userToAddId, string teamName);
         Task<List<User>> GetTeamMembertsByIdAsync(int teamId);
         Task<List<User>> GetUserFriendsList(int userId);
         Task<bool> СhangeTeamNameAsync(int teamCreatorId, ChangeTeamNameDTO changeTeamNameDTO);
+        Task<bool> DeleteUserFromTheTeamAsync(int teamCreatorId, int userToDeleteId, string teamName);
+        Task<bool> ChangeUserMainInfo(User mappedUser);
     }
 }

@@ -41,6 +41,28 @@ namespace TaskManager.Api.Controllers
             }
         }
 
+        [HttpPost("ChangeUserMainInfo")]
+        [Authorize]
+        public async Task<IActionResult> ChangeUserMainInfo([FromBody] BaseUserDTO userDTO)
+        {
+            try
+            {
+                if (HttpContext.User.Identity is ClaimsIdentity identity)
+                {
+                    int userId = int.Parse(identity?.Claims.FirstOrDefault(e => e.Type == ClaimTypes.NameIdentifier)?.Value);
+                    userDTO.Id = userId;
+                    var userData = await _accountManager.ChangeUserMainInfo(userDTO);
+                    return Ok(userData);
+                }
+
+                return BadRequest(ResponseFormater.Error(ErrorCodes.EntityNotFound));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ResponseFormater.Error(ErrorCodes.InternalServerException));
+            }
+        }
+
         [HttpPost("ChangePassword")]
         [Authorize]
         public async Task<IActionResult> ChangeUserPassword([FromBody] UserLogin userLogin)
