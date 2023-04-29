@@ -12,6 +12,7 @@ namespace TaskManager.Api
         {
             builder.RegisterType<AccountManager>().As<IAccountManager>();
             builder.RegisterType<TeamManager>().As<ITeamManager>();
+            builder.RegisterType<TaskPlanManager>().As<ITaskPlanManager>();
             builder.RegisterType<DBAccessor>().As<IDBAccessor>()
                 .WithParameter("rapaportConnectionString", EnvironmentVariables.DbConnectionString);
         }

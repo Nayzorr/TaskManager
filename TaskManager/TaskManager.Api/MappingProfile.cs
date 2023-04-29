@@ -12,6 +12,7 @@ namespace TaskManager.Api
             CreateMap<User, BaseUserDTO>();
             CreateMap<BaseUserDTO, User>().ForMember(dest => dest.PasswordHash, opt => opt.UseDestinationValue());
             CreateMap<Team, TeamInfoDTO>().ReverseMap();
+            CreateMap<DO.Task, TaskCreateUpdateSelfUserDTO>().ReverseMap();
         }
     }
 }

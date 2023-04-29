@@ -8,7 +8,7 @@ namespace TaskManager.Api.DO
         public int Id { get; set; }
         public int TaskId { get; set; }
         public int UserId { get; set; }
-        public int TeamId { get; set; }
+        public int? TeamId { get; set; }
 
         public virtual Task Task { get; set; } = null!;
         public virtual Team Team { get; set; } = null!;

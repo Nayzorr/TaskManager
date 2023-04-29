@@ -56,7 +56,7 @@ namespace TaskManager.Api.Managers
 
             var mappedTeam = _mapper.Map<TeamInfoDTO>(result);
 
-            var teamMembers = await _dbAccessor.GetTeamMembertsByIdAsync(mappedTeam.Id);
+            var teamMembers = await _dbAccessor.GetTeamMembersByIdAsync(mappedTeam.Id);
 
             var mappedTeamMembers = _mapper.Map<List<BaseUserDTO>>(teamMembers);
 

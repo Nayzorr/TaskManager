@@ -17,10 +17,13 @@ namespace TaskManager.Api.Accessors.Interfaces
         Task<bool> InvitePersonToTeamAsync(int inviterId, int teamId, string personToIviteUserName);
         Task<Team> GetTeamMainInfoByNameAsync(string teamName);
         Task<bool> AddUserToTheTeamAsync(int teamCreatorId, int userToAddId, string teamName);
-        Task<List<User>> GetTeamMembertsByIdAsync(int teamId);
+        Task<List<User>> GetTeamMembersByIdAsync(int teamId);
         Task<List<User>> GetUserFriendsList(int userId);
         Task<bool> СhangeTeamNameAsync(int teamCreatorId, ChangeTeamNameDTO changeTeamNameDTO);
         Task<bool> DeleteUserFromTheTeamAsync(int teamCreatorId, int userToDeleteId, string teamName);
         Task<bool> ChangeUserMainInfo(User mappedUser);
+        Task<bool> CreateTaskAsync(DO.Task newTask, int currentUserId);
+        Task<DO.Task> GetTaskByIdAsync(int taskId);
+        Task<bool> UpdateTaskInfoAsync(DO.Task taskToUpdate);
     }
 }

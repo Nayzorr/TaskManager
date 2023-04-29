@@ -84,6 +84,10 @@ namespace TaskManager.Api.DO
                     .HasMaxLength(255)
                     .IsUnicode(false);
 
+                entity.Property(e => e.Description)
+                   .HasMaxLength(255)
+                   .IsUnicode(false);
+
                 entity.HasOne(d => d.Parent)
                     .WithMany(p => p.InverseParent)
                     .HasForeignKey(d => d.ParentId)

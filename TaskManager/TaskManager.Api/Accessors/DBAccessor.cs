@@ -211,7 +211,7 @@ namespace TaskManager.Api.Accessors
             return team;
         }
 
-        public async Task<List<User>> GetTeamMembertsByIdAsync(int teamId)
+        public async Task<List<User>> GetTeamMembersByIdAsync(int teamId)
         {
             using var context = new TaskManagerContext(_rapaportConnectionString);
 
@@ -337,10 +337,61 @@ namespace TaskManager.Api.Accessors
         public async Task<bool> ChangeUserMainInfo(User mappedUser)
         {
             using var context = new TaskManagerContext(_rapaportConnectionString);
-    
+
             context.Users.Update(mappedUser);
             await context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<bool> UpdateTaskInfoAsync(DO.Task taskToUpdate)
+        {
+            using var context = new TaskManagerContext(_rapaportConnectionString);
+
+            context.Tasks.Update(taskToUpdate);
+            await context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<DO.Task> GetTaskByIdAsync(int taskId)
+        {
+            using var context = new TaskManagerContext(_rapaportConnectionString);
+
+            var task = await context.Tasks.AsNoTracking()
+               .SingleOrDefaultAsync(o => o.Id == taskId);
+
+            return task;
+        }
+
+        public async Task<bool> CreateTaskAsync(DO.Task newTask, int currentUserId)
+        {
+            using var context = new TaskManagerContext(_rapaportConnectionString);
+
+            using var transaction = context.Database.BeginTransaction();
+
+            try
+            {
+                await context.Tasks.AddAsync(newTask);
+                await context.SaveChangesAsync();
+
+                int newTaskId = newTask.Id;
+
+                await context.TaskAssignments.AddAsync(new TaskAssignment()
+                {
+                    TaskId = newTaskId,
+                    UserId = currentUserId,
+                    TeamId = null // For non-team tasks
+                });
+
+                await context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                throw;
+            }
         }
     }
 }

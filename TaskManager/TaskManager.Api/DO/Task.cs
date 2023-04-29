@@ -16,8 +16,9 @@ namespace TaskManager.Api.DO
         public int TaskStatusId { get; set; }
         public string Name { get; set; } = null!;
         public DateTime DateCreated { get; set; }
-        public DateTime DateScheduled { get; set; }
+        public DateTime? DateScheduled { get; set; }
         public int? ParentId { get; set; }
+        public string Description { get; set; }
 
         public virtual Task? Parent { get; set; }
         public virtual TaskPriority TaskPriority { get; set; } = null!;
