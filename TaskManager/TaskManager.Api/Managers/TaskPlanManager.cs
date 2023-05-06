@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Connections.Features;
+using System.Threading.Tasks;
 using TaskManager.Api.Accessors.Interfaces;
 using TaskManager.Api.DO;
 using TaskManager.Api.Helpers;
@@ -48,6 +50,21 @@ namespace TaskManager.Api.Managers
                 var result = await _dbAccessor.UpdateTaskAsync(existingtask, currentUserId, taskCreateUpdateDTO.TeamMemberUserId, taskCreateUpdateDTO.TeamId);
                 return ResponseFormater.OK(result);
             }
+        }
+
+        public async Task<ResponseDTO<bool>> DeleteTaskAsync(int currentUserId, int taskId)
+        {
+            var existingtask = await _dbAccessor.GetTaskByIdAsync(taskId);
+
+            if (existingtask is null)
+            {
+                throw new Exception("No Task to update, this task doesn't exists");
+            }
+
+            var childTasks = await _dbAccessor.GetChildTasksByTaskIdAsync(existingtask.Id);
+
+            var result = await _dbAccessor.DeleteTaskAsync(existingtask, childTasks);
+            return ResponseFormater.OK(result);
         }
 
         private async System.Threading.Tasks.Task CheckParentTaskIdValid(TaskCreateUpdateDTO taskCreateUpdateDTO)

@@ -195,7 +195,8 @@ namespace TaskManager.Api.Accessors
                 throw new Exception("User is not team creator, or team not found");
             }
 
-            context.Teams.Remove(teamToDelete);
+            context.Teams.Remove(teamToDelete); //it will remove all tasks assigned to team and team invtitation
+
             await context.SaveChangesAsync();
 
             return true;
@@ -378,6 +379,41 @@ namespace TaskManager.Api.Accessors
                 transaction.Rollback();
                 throw;
             }
+        }
+
+        public async Task<List<DO.Task>> GetChildTasksByTaskIdAsync(int? taskId)
+        {
+            using var context = new TaskManagerContext(_rapaportConnectionString);
+
+            var childTasks = await context.Tasks.Where(e => e.ParentId == taskId).ToListAsync();
+
+            return childTasks;
+        }
+
+        public async Task<bool> DeleteTaskAsync(DO.Task existingtask, List<DO.Task> childTasks)
+        {
+            using var context = new TaskManagerContext(_rapaportConnectionString);
+            using var transaction = context.Database.BeginTransaction();
+
+            try
+            {
+                if (childTasks is not null && childTasks.Any())
+                {
+                    context.Tasks.RemoveRange(childTasks);
+                }
+
+                context.Remove(existingtask);
+                await context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                throw;
+            }
+
         }
 
         #endregion

@@ -29,5 +29,7 @@ namespace TaskManager.Api.Accessors.Interfaces
         Task<List<Team>> GetTeamsByTeamIds(List<int> teamIds);
         Task<bool> RejectTeamInvitationAsync(int userId, string teamName);
         Task<bool> DeleteTeamAsync(int userId, int teamIdToDelete);
+        Task<List<DO.Task>> GetChildTasksByTaskIdAsync(int? taskId);
+        Task<bool> DeleteTaskAsync(DO.Task existingtask, List<DO.Task> childTasks);
     }
 }

@@ -42,5 +42,26 @@ namespace TaskManager.Api.Controllers
                 return BadRequest(ResponseFormater.Error(ErrorCodes.InternalServerException));
             }
         }
+
+        [HttpDelete("DeleteTask")]
+        [Authorize]
+        public async Task<IActionResult> DeleteTaskAsync(int taskId)
+        {
+            try
+            {
+                if (HttpContext.User.Identity is ClaimsIdentity identity)
+                {
+                    int currentUserId = int.Parse(identity?.Claims.FirstOrDefault(e => e.Type == ClaimTypes.NameIdentifier)?.Value);
+                    var result = await _taskPlanManager.DeleteTaskAsync(currentUserId, taskId);
+                    return Ok(result);
+                }
+
+                return BadRequest(ResponseFormater.Error(ErrorCodes.EntityNotFound));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ResponseFormater.Error(ErrorCodes.InternalServerException));
+            }
+        }
     }
 }
