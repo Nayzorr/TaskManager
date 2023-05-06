@@ -24,7 +24,7 @@ namespace TaskManager.Api.Controllers
 
         [HttpPost("CreateUpdateTask")]
         [Authorize]
-        public async Task<IActionResult> CreateUpdateTaskAsync([FromBody] TaskCreateUpdateSelfUserDTO taskCreateUpdateDTO)
+        public async Task<IActionResult> CreateUpdateTaskAsync([FromBody] TaskCreateUpdateDTO taskCreateUpdateDTO)
         {
             try
             {

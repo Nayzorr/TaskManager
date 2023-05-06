@@ -29,8 +29,29 @@ namespace TaskManager.Api.Controllers
                 if (HttpContext.User.Identity is ClaimsIdentity identity)
                 {
                     int userId = int.Parse(identity?.Claims.FirstOrDefault(e => e.Type == ClaimTypes.NameIdentifier)?.Value);
-                    var userData = await _teamManager.CreateTeam(userId, createTeamDTO);
-                    return Ok(userData);
+                    var result = await _teamManager.CreateTeam(userId, createTeamDTO);
+                    return Ok(result);
+                }
+
+                return BadRequest(ResponseFormater.Error(ErrorCodes.EntityNotFound));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ResponseFormater.Error(ex, ErrorCodes.InternalServerException));
+            }
+        }
+
+        [HttpDelete("DeleteTeam")]
+        [Authorize]
+        public async Task<IActionResult> DeleteTeam(int teamIdToDelete)
+        {
+            try
+            {
+                if (HttpContext.User.Identity is ClaimsIdentity identity)
+                {
+                    int userId = int.Parse(identity?.Claims.FirstOrDefault(e => e.Type == ClaimTypes.NameIdentifier)?.Value);
+                    var result = await _teamManager.DeleteTeamAsync(userId, teamIdToDelete);
+                    return Ok(result);
                 }
 
                 return BadRequest(ResponseFormater.Error(ErrorCodes.EntityNotFound));
@@ -50,8 +71,8 @@ namespace TaskManager.Api.Controllers
                 if (HttpContext.User.Identity is ClaimsIdentity identity)
                 {
                     int userId = int.Parse(identity?.Claims.FirstOrDefault(e => e.Type == ClaimTypes.NameIdentifier)?.Value);
-                    var userData = await _teamManager.СhangeTeamName(userId, changeTeamNameDto);
-                    return Ok(userData);
+                    var result = await _teamManager.СhangeTeamName(userId, changeTeamNameDto);
+                    return Ok(result);
                 }
 
                 return BadRequest(ResponseFormater.Error(ErrorCodes.EntityNotFound));
@@ -68,8 +89,8 @@ namespace TaskManager.Api.Controllers
         {
             try
             {
-                var userData = await _teamManager.GetTeamMainInfoByName(teamName);
-                return Ok(userData);
+                var result = await _teamManager.GetTeamMainInfoByName(teamName);
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -83,8 +104,8 @@ namespace TaskManager.Api.Controllers
         {
             try
             {
-                var userData = await _teamManager.CheckIfTeamNameUnique(teamDto);
-                return Ok(userData);
+                var result = await _teamManager.CheckIfTeamNameUnique(teamDto);
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -101,8 +122,8 @@ namespace TaskManager.Api.Controllers
                 if (HttpContext.User.Identity is ClaimsIdentity identity)
                 {
                     int invtiterId = int.Parse(identity?.Claims.FirstOrDefault(e => e.Type == ClaimTypes.NameIdentifier)?.Value);
-                    var userData = await _teamManager.InvitePersonToTeam(invtiterId, teamId, personToInviteUserName);
-                    return Ok(userData);
+                    var result = await _teamManager.InvitePersonToTeam(invtiterId, teamId, personToInviteUserName);
+                    return Ok(result);
                 }
 
                 return BadRequest(ResponseFormater.Error(ErrorCodes.EntityNotFound));
@@ -113,17 +134,59 @@ namespace TaskManager.Api.Controllers
             }
         }
 
-        [HttpPost("AddUserToTheTeam/{userToAddId}")]
+        [HttpGet("GetMyTeamInvitations")]
         [Authorize]
-        public async Task<IActionResult> AddUserToTheTeam(int userToAddId, string teamName)
+        public async Task<IActionResult> GetMyInvitationsAsync()
         {
             try
             {
                 if (HttpContext.User.Identity is ClaimsIdentity identity)
                 {
-                    int teamCreatorId = int.Parse(identity?.Claims.FirstOrDefault(e => e.Type == ClaimTypes.NameIdentifier)?.Value);
-                    var userData = await _teamManager.AddUserToTheTeam(teamCreatorId, userToAddId, teamName);
-                    return Ok(userData);
+                    int userId = int.Parse(identity?.Claims.FirstOrDefault(e => e.Type == ClaimTypes.NameIdentifier)?.Value);
+                    var result = await _teamManager.GetMyTeamInvitationsAsync(userId);
+                    return Ok(result);
+                }
+
+                return BadRequest(ResponseFormater.Error(ErrorCodes.EntityNotFound));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ResponseFormater.Error(ex, ErrorCodes.InternalServerException));
+            }
+        }
+
+        [HttpPut("AcceptTeamInvitation")]
+        [Authorize]
+        public async Task<IActionResult> AcceptTeamInvitation(string teamName)
+        {
+            try
+            {
+                if (HttpContext.User.Identity is ClaimsIdentity identity)
+                {
+                    int userId = int.Parse(identity?.Claims.FirstOrDefault(e => e.Type == ClaimTypes.NameIdentifier)?.Value);
+                    var result = await _teamManager.AcceptTeamInvitationAsync(userId, teamName);
+                    return Ok(result);
+                }
+
+                return BadRequest(ResponseFormater.Error(ErrorCodes.EntityNotFound));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ResponseFormater.Error(ex, ErrorCodes.InternalServerException));
+            }
+        }
+
+        [HttpPut("RejectTeamInvitation")]
+        [Authorize]
+        public async Task<IActionResult> RejectTeamInvitation(string teamName)
+        {
+            try
+            {
+                if (HttpContext.User.Identity is ClaimsIdentity identity)
+                {
+                    int userId = int.Parse(identity?.Claims.FirstOrDefault(e => e.Type == ClaimTypes.NameIdentifier)?.Value);
+                    var result = await _teamManager.RejectTeamInvitationAsync(userId, teamName);
+                    return Ok(result);
                 }
 
                 return BadRequest(ResponseFormater.Error(ErrorCodes.EntityNotFound));
@@ -144,8 +207,8 @@ namespace TaskManager.Api.Controllers
                 if (HttpContext.User.Identity is ClaimsIdentity identity)
                 {
                     int teamCreatorId = int.Parse(identity?.Claims.FirstOrDefault(e => e.Type == ClaimTypes.NameIdentifier)?.Value);
-                    var userData = await _teamManager.DeleteUserFromTheTeamAsync(teamCreatorId, userToDeleteId, teamName);
-                    return Ok(userData);
+                    var result = await _teamManager.DeleteUserFromTheTeamAsync(teamCreatorId, userToDeleteId, teamName);
+                    return Ok(result);
                 }
 
                 return BadRequest(ResponseFormater.Error(ErrorCodes.EntityNotFound));

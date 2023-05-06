@@ -9,6 +9,5 @@ namespace TaskManager.Api.Models.DTOs
         public string TeamName { get; set; } = null!;
         public DateTime DateCreated { get; set; }
         public List<BaseUserDTO> TeamMembers { get; set; }
-
     }
 }

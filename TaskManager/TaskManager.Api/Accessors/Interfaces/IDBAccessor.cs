@@ -16,14 +16,18 @@ namespace TaskManager.Api.Accessors.Interfaces
         Task<bool> CheckIfTeamNameUniqueAsync(CreateTeamDTO teamDto);
         Task<bool> InvitePersonToTeamAsync(int inviterId, int teamId, string personToIviteUserName);
         Task<Team> GetTeamMainInfoByNameAsync(string teamName);
-        Task<bool> AddUserToTheTeamAsync(int teamCreatorId, int userToAddId, string teamName);
+        Task<bool> AcceptTeamInvitationAsync(int userToAddId, string teamName);
         Task<List<User>> GetTeamMembersByIdAsync(int teamId);
         Task<List<User>> GetUserFriendsList(int userId);
         Task<bool> СhangeTeamNameAsync(int teamCreatorId, ChangeTeamNameDTO changeTeamNameDTO);
         Task<bool> DeleteUserFromTheTeamAsync(int teamCreatorId, int userToDeleteId, string teamName);
         Task<bool> ChangeUserMainInfo(User mappedUser);
-        Task<bool> CreateTaskAsync(DO.Task newTask, int currentUserId);
+        Task<bool> CreateTaskAsync(DO.Task newTask, int currentUserId, int? teamMemberId, int? teamId);
         Task<DO.Task> GetTaskByIdAsync(int taskId);
-        Task<bool> UpdateTaskInfoAsync(DO.Task taskToUpdate);
+        Task<bool> UpdateTaskAsync(DO.Task taskToUpdate, int currentUserId, int? teamMemberId, int? teamId);
+        Task<List<TeamInvitation>> GetUserTeamInvitationsAsync(int userId);
+        Task<List<Team>> GetTeamsByTeamIds(List<int> teamIds);
+        Task<bool> RejectTeamInvitationAsync(int userId, string teamName);
+        Task<bool> DeleteTeamAsync(int userId, int teamIdToDelete);
     }
 }

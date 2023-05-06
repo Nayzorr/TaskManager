@@ -17,9 +17,15 @@ namespace TaskManager.Api.Managers
             _mapper = mapper;
         }
 
-        public async Task<ResponseDTO<bool>> AddUserToTheTeam(int teamCreatorId, int userToAddId, string teamName)
+        public async Task<ResponseDTO<bool>> AcceptTeamInvitationAsync(int userToAddId, string teamName)
         {
-            var result = await _dbAccessor.AddUserToTheTeamAsync(teamCreatorId, userToAddId, teamName);
+            var result = await _dbAccessor.AcceptTeamInvitationAsync(userToAddId, teamName);
+            return ResponseFormater.OK(result);
+        }
+
+        public async Task<ResponseDTO<bool>> RejectTeamInvitationAsync(int userId, string teamName)
+        {
+            var result = await _dbAccessor.RejectTeamInvitationAsync(userId, teamName);
             return ResponseFormater.OK(result);
         }
 
@@ -50,6 +56,24 @@ namespace TaskManager.Api.Managers
             return ResponseFormater.OK(result);
         }
 
+        public async Task<ResponseDTO<List<TeamInfoDTO>>> GetMyTeamInvitationsAsync(int userId)
+        {
+            var userTeamInvitations = await _dbAccessor.GetUserTeamInvitationsAsync(userId);
+
+            var teams = await _dbAccessor.GetTeamsByTeamIds(userTeamInvitations.Select(e => e.TeamId).ToList());
+
+            var mappedTeams = _mapper.Map<List<TeamInfoDTO>>(teams);
+
+            foreach (var mappedTeam in mappedTeams)
+            {
+                var teamMembers = await _dbAccessor.GetTeamMembersByIdAsync(mappedTeam.Id);
+                var mappedTeamMembers = _mapper.Map<List<BaseUserDTO>>(teamMembers);
+                mappedTeam.TeamMembers = mappedTeamMembers;
+            }
+
+            return ResponseFormater.OK(mappedTeams);
+        }
+
         public async Task<ResponseDTO<TeamInfoDTO>> GetTeamMainInfoByName(string teamName)
         {
             var result = await _dbAccessor.GetTeamMainInfoByNameAsync(teamName);
@@ -77,6 +101,13 @@ namespace TaskManager.Api.Managers
         public async Task<ResponseDTO<bool>> СhangeTeamName(int teamCreatorId, ChangeTeamNameDTO changeTeamNameDTO)
         {
             var result = await _dbAccessor.СhangeTeamNameAsync(teamCreatorId, changeTeamNameDTO);
+
+            return ResponseFormater.OK(result);
+        }
+
+        public async Task<ResponseDTO<bool>> DeleteTeamAsync(int userId,int teamIdToDelete)
+        {
+            var result = await _dbAccessor.DeleteTeamAsync(userId, teamIdToDelete);
 
             return ResponseFormater.OK(result);
         }

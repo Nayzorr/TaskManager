@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using TaskManager.Api.Accessors.Interfaces;
+using TaskManager.Api.DO;
+using TaskManager.Api.Helpers;
 using TaskManager.Api.Managers.Interfaces;
 using TaskManager.Api.Models.DTOs;
 
@@ -16,13 +18,15 @@ namespace TaskManager.Api.Managers
             _mapper = mapper;
         }
 
-        public async Task<ResponseDTO<bool>> CreateUpdateTaskAsync(TaskCreateUpdateSelfUserDTO taskCreateUpdateDTO, int currentUserId)
+        public async Task<ResponseDTO<bool>> CreateUpdateTaskAsync(TaskCreateUpdateDTO taskCreateUpdateDTO, int currentUserId)
         {
+            await CheckParentTaskIdValid(taskCreateUpdateDTO);
+
             if (taskCreateUpdateDTO.Id == default)
             {
                 var newTask = _mapper.Map<DO.Task>(taskCreateUpdateDTO);
 
-                var result = await _dbAccessor.CreateTaskAsync(newTask, currentUserId);
+                var result = await _dbAccessor.CreateTaskAsync(newTask, currentUserId, taskCreateUpdateDTO.TeamMemberUserId, taskCreateUpdateDTO.TeamId);
                 return ResponseFormater.OK(result);
             }
             else
@@ -34,16 +38,6 @@ namespace TaskManager.Api.Managers
                     throw new Exception("No Task to update, this task doesn't exists");
                 }
 
-                if (taskCreateUpdateDTO.ParentId is not null)
-                {
-                    var parentTask = await _dbAccessor.GetTaskByIdAsync((int)taskCreateUpdateDTO.ParentId);
-
-                    if (parentTask is null)
-                    {
-                        throw new Exception("Parent Task doesn't exists");
-                    }
-                }
-
                 existingtask.Name = taskCreateUpdateDTO.Name;
                 existingtask.TaskPriorityId = taskCreateUpdateDTO.TaskPriorityId;
                 existingtask.TaskStatusId = taskCreateUpdateDTO.TaskStatusId;
@@ -51,8 +45,26 @@ namespace TaskManager.Api.Managers
                 existingtask.Description = taskCreateUpdateDTO.Description;
                 existingtask.ParentId = taskCreateUpdateDTO.ParentId;
 
-                var result = await _dbAccessor.UpdateTaskInfoAsync(existingtask);
+                var result = await _dbAccessor.UpdateTaskAsync(existingtask, currentUserId, taskCreateUpdateDTO.TeamMemberUserId, taskCreateUpdateDTO.TeamId);
                 return ResponseFormater.OK(result);
+            }
+        }
+
+        private async System.Threading.Tasks.Task CheckParentTaskIdValid(TaskCreateUpdateDTO taskCreateUpdateDTO)
+        {
+            if (taskCreateUpdateDTO.ParentId == 0 || taskCreateUpdateDTO.Id == taskCreateUpdateDTO.ParentId)
+            {
+                taskCreateUpdateDTO.ParentId = null;
+            }
+
+            if (taskCreateUpdateDTO.ParentId.HasValue)
+            {
+                var parentTask = await _dbAccessor.GetTaskByIdAsync(taskCreateUpdateDTO.ParentId.Value);
+
+                if (parentTask == null)
+                {
+                    throw new Exception("Parent task does not exist.");
+                }
             }
         }
     }
