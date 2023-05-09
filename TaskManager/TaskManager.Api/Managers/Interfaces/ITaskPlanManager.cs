@@ -6,5 +6,6 @@ namespace TaskManager.Api.Managers.Interfaces
     {
         Task<ResponseDTO<bool>> CreateUpdateTaskAsync(TaskCreateUpdateDTO taskCreateUpdateDTO, int currentUserId);
         Task<ResponseDTO<bool>> DeleteTaskAsync(int currentUserId, int taskId);
+        Task<ResponseDTO<TaskDTO>> GetTaskById(int currentUserId, int taskId);
     }
 }

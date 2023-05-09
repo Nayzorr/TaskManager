@@ -22,14 +22,16 @@ namespace TaskManager.Api.Accessors.Interfaces
         Task<bool> СhangeTeamNameAsync(int teamCreatorId, ChangeTeamNameDTO changeTeamNameDTO);
         Task<bool> DeleteUserFromTheTeamAsync(int teamCreatorId, int userToDeleteId, string teamName);
         Task<bool> ChangeUserMainInfo(User mappedUser);
-        Task<bool> CreateTaskAsync(DO.Task newTask, int currentUserId, int? teamMemberId, int? teamId);
+        Task<bool> CreateTaskAsync(DO.Task newTask, int currentUserId, List<int> teamMembersIds, int? teamId);
         Task<DO.Task> GetTaskByIdAsync(int taskId);
-        Task<bool> UpdateTaskAsync(DO.Task taskToUpdate, int currentUserId, int? teamMemberId, int? teamId);
+        Task<bool> UpdateTaskAsync(DO.Task taskToUpdate, int currentUserId, List<int> teamMembersIds, int? teamId);
         Task<List<TeamInvitation>> GetUserTeamInvitationsAsync(int userId);
         Task<List<Team>> GetTeamsByTeamIds(List<int> teamIds);
         Task<bool> RejectTeamInvitationAsync(int userId, string teamName);
         Task<bool> DeleteTeamAsync(int userId, int teamIdToDelete);
         Task<List<DO.Task>> GetChildTasksByTaskIdAsync(int? taskId);
         Task<bool> DeleteTaskAsync(DO.Task existingtask, List<DO.Task> childTasks);
+        Task<DO.Task> GetTaskFullInfokByIdAsync(int taskId);
+        Task<List<DO.Task>> GetChildTasksFullInfoByTaskIdAsync(int? taskId);
     }
 }

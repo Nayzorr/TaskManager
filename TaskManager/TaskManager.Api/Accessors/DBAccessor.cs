@@ -269,14 +269,12 @@ namespace TaskManager.Api.Accessors
 
         #region Task
 
-        public async Task<bool> UpdateTaskAsync(DO.Task taskToUpdate, int currentUserId, int? teamMemberId, int? teamId)
+        public async Task<bool> UpdateTaskAsync(DO.Task taskToUpdate, int currentUserId, List<int> teamMembersIds, int? teamId)
         {
             using var context = new TaskManagerContext(_rapaportConnectionString);
 
-            if (BasicOperationsHelper.CheckIntValueValid(teamMemberId) && BasicOperationsHelper.CheckIntValueValid(teamId))
+            if (teamMembersIds is not null && teamMembersIds.Any())
             {
-                var isUserExistsInTeam = await context.UserTeams.AnyAsync(o => o.TeamId == teamId && o.UserId == teamMemberId);
-
                 var teamCreator = await context.Teams.SingleOrDefaultAsync(o => o.CreatorId == currentUserId && o.Id == teamId);
 
                 if (teamCreator is null)
@@ -284,26 +282,12 @@ namespace TaskManager.Api.Accessors
                     throw new Exception($"{currentUserId} is not team creator, or team is not found, cannot to assign the task");
                 }
 
-                if (!await context.UserTeams.AnyAsync(o => o.TeamId == teamId && o.UserId == teamMemberId))
+                foreach (var memberId in teamMembersIds)
                 {
-                    throw new Exception($"User with Id {teamMemberId} doesn't belongs to the team, cannot assign the task.");
-                }
-
-                var taskAssignment = await context.TaskAssignments.SingleOrDefaultAsync(e => e.TaskId == taskToUpdate.Id);
-
-                if (teamCreator is null)
-                {
-                    await context.TaskAssignments.AddAsync(new TaskAssignment()
+                    if (BasicOperationsHelper.CheckIntValueValid(memberId) && BasicOperationsHelper.CheckIntValueValid(teamId))
                     {
-                        TaskId = taskToUpdate.Id,
-                        UserId = teamMemberId.Value,
-                        TeamId = teamId // For team tasks
-                    });
-                }
-                else
-                {
-                    taskAssignment.UserId = teamMemberId.Value;
-                    context.TaskAssignments.Update(taskAssignment);
+                        await UpdateTaskIfTeamUpdate(taskToUpdate, teamId, memberId, context);
+                    }
                 }
             }
             else
@@ -315,17 +299,57 @@ namespace TaskManager.Api.Accessors
             return true;
         }
 
+        private static async System.Threading.Tasks.Task UpdateTaskIfTeamUpdate(DO.Task taskToUpdate, int? teamId, int teamMemberId, TaskManagerContext context)
+        {
+            var isUserExistsInTeam = await context.UserTeams.AnyAsync(o => o.TeamId == teamId && o.UserId == teamMemberId);
+
+            if (!await context.UserTeams.AnyAsync(o => o.TeamId == teamId && o.UserId == teamMemberId))
+            {
+                throw new Exception($"User with Id {teamMemberId} doesn't belongs to the team, cannot assign the task.");
+            }
+
+            var taskAssignment = await context.TaskAssignments.SingleOrDefaultAsync(e => e.TaskId == taskToUpdate.Id);
+
+            if (taskAssignment is null)
+            {
+                await context.TaskAssignments.AddAsync(new TaskAssignment()
+                {
+                    TaskId = taskToUpdate.Id,
+                    UserId = teamMemberId,
+                    TeamId = teamId // For team tasks
+                });
+            }
+            else
+            {
+                taskAssignment.UserId = teamMemberId;
+                context.TaskAssignments.Update(taskAssignment);
+            }
+        }
+
         public async Task<DO.Task> GetTaskByIdAsync(int taskId)
         {
             using var context = new TaskManagerContext(_rapaportConnectionString);
 
             var task = await context.Tasks.AsNoTracking()
-               .SingleOrDefaultAsync(o => o.Id == taskId);
+              .SingleOrDefaultAsync(o => o.Id == taskId);
 
             return task;
         }
 
-        public async Task<bool> CreateTaskAsync(DO.Task newTask, int currentUserId, int? teamMemberId, int? teamId)
+        public async Task<DO.Task> GetTaskFullInfokByIdAsync(int taskId)
+        {
+            using var context = new TaskManagerContext(_rapaportConnectionString);
+
+            var task = await context.Tasks
+                .Include(e => e.TaskStatus)
+                .Include(e => e.TaskPriority)
+                .Include(e => e.TaskAssignments)
+                .SingleOrDefaultAsync(o => o.Id == taskId);
+
+            return task;
+        }
+
+        public async Task<bool> CreateTaskAsync(DO.Task newTask, int currentUserId, List<int> teamMembersIds, int? teamId)
         {
             using var context = new TaskManagerContext(_rapaportConnectionString);
 
@@ -338,7 +362,7 @@ namespace TaskManager.Api.Accessors
 
                 int newTaskId = newTask.Id;
 
-                if (BasicOperationsHelper.CheckIntValueValid(teamMemberId) && BasicOperationsHelper.CheckIntValueValid(teamId))
+                if (teamMembersIds is not null && teamMembersIds.Any())
                 {
                     var teamCreator = await context.Teams.SingleOrDefaultAsync(o => o.CreatorId == currentUserId && o.Id == teamId);
 
@@ -347,17 +371,23 @@ namespace TaskManager.Api.Accessors
                         throw new Exception($"{currentUserId} is not team creator, or team is not found, cannot to assign the task");
                     }
 
-                    if (!await context.UserTeams.AnyAsync(o => o.TeamId == teamId && o.UserId == teamMemberId))
+                    foreach (var teamMemberId in teamMembersIds)
                     {
-                        throw new Exception($"User with Id {teamMemberId} doesn't belongs to the team, cannot assign the task.");
-                    }
+                        if (BasicOperationsHelper.CheckIntValueValid(teamMemberId) && BasicOperationsHelper.CheckIntValueValid(teamId))
+                        {
+                            if (!await context.UserTeams.AnyAsync(o => o.TeamId == teamId && o.UserId == teamMemberId))
+                            {
+                                throw new Exception($"User with Id {teamMemberId} doesn't belongs to the team, cannot assign the task.");
+                            }
 
-                    await context.TaskAssignments.AddAsync(new TaskAssignment()
-                    {
-                        TaskId = newTaskId,
-                        UserId = teamMemberId.Value,
-                        TeamId = teamId // For team tasks
-                    });
+                            await context.TaskAssignments.AddAsync(new TaskAssignment()
+                            {
+                                TaskId = newTaskId,
+                                UserId = teamMemberId,
+                                TeamId = teamId // For team tasks
+                            });
+                        }
+                    }
                 }
                 else
                 {
@@ -386,6 +416,17 @@ namespace TaskManager.Api.Accessors
             using var context = new TaskManagerContext(_rapaportConnectionString);
 
             var childTasks = await context.Tasks.Where(e => e.ParentId == taskId).ToListAsync();
+
+            return childTasks;
+        }
+
+        public async Task<List<DO.Task>> GetChildTasksFullInfoByTaskIdAsync(int? taskId)
+        {
+            using var context = new TaskManagerContext(_rapaportConnectionString);
+
+            var childTasks = await context.Tasks.Include(e => e.TaskStatus)
+                .Include(e => e.TaskPriority)
+                .Include(e => e.TaskAssignments).Where(e => e.ParentId == taskId).ToListAsync();
 
             return childTasks;
         }

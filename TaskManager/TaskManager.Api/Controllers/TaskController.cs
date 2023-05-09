@@ -63,5 +63,26 @@ namespace TaskManager.Api.Controllers
                 return BadRequest(ResponseFormater.Error(ErrorCodes.InternalServerException));
             }
         }
+
+        [HttpGet("GetTaskById/{taskId}")]
+        [Authorize]
+        public async Task<IActionResult> GetTaskById(int taskId)
+        {
+            try
+            {
+                if (HttpContext.User.Identity is ClaimsIdentity identity)
+                {
+                    int currentUserId = int.Parse(identity?.Claims.FirstOrDefault(e => e.Type == ClaimTypes.NameIdentifier)?.Value);
+                    var result = await _taskPlanManager.GetTaskById(currentUserId, taskId);
+                    return Ok(result);
+                }
+
+                return BadRequest(ResponseFormater.Error(ErrorCodes.EntityNotFound));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ResponseFormater.Error(ErrorCodes.InternalServerException));
+            }
+        }
     }
 }

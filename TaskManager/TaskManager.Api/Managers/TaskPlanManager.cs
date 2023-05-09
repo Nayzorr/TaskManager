@@ -1,9 +1,5 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Connections.Features;
-using System.Threading.Tasks;
 using TaskManager.Api.Accessors.Interfaces;
-using TaskManager.Api.DO;
-using TaskManager.Api.Helpers;
 using TaskManager.Api.Managers.Interfaces;
 using TaskManager.Api.Models.DTOs;
 
@@ -28,7 +24,7 @@ namespace TaskManager.Api.Managers
             {
                 var newTask = _mapper.Map<DO.Task>(taskCreateUpdateDTO);
 
-                var result = await _dbAccessor.CreateTaskAsync(newTask, currentUserId, taskCreateUpdateDTO.TeamMemberUserId, taskCreateUpdateDTO.TeamId);
+                var result = await _dbAccessor.CreateTaskAsync(newTask, currentUserId, taskCreateUpdateDTO.TeamMembersUserIds, taskCreateUpdateDTO.TeamId);
                 return ResponseFormater.OK(result);
             }
             else
@@ -47,7 +43,7 @@ namespace TaskManager.Api.Managers
                 existingtask.Description = taskCreateUpdateDTO.Description;
                 existingtask.ParentId = taskCreateUpdateDTO.ParentId;
 
-                var result = await _dbAccessor.UpdateTaskAsync(existingtask, currentUserId, taskCreateUpdateDTO.TeamMemberUserId, taskCreateUpdateDTO.TeamId);
+                var result = await _dbAccessor.UpdateTaskAsync(existingtask, currentUserId, taskCreateUpdateDTO.TeamMembersUserIds, taskCreateUpdateDTO.TeamId);
                 return ResponseFormater.OK(result);
             }
         }
@@ -65,6 +61,24 @@ namespace TaskManager.Api.Managers
 
             var result = await _dbAccessor.DeleteTaskAsync(existingtask, childTasks);
             return ResponseFormater.OK(result);
+        }
+
+        public async Task<ResponseDTO<TaskDTO>> GetTaskById(int currentUserId, int taskId)
+        {
+            var existingtask = await _dbAccessor.GetTaskFullInfokByIdAsync(taskId);
+
+            if (existingtask is null)
+            {
+                throw new Exception("Task doesn't exists");
+            }
+
+            var mappedTask = _mapper.Map<TaskDTO>(existingtask);
+
+            var childTasks = await _dbAccessor.GetChildTasksFullInfoByTaskIdAsync(existingtask.Id);
+            var mappedChildTasks = _mapper.Map<List<TaskDTO>>(childTasks);
+            mappedTask.SubTasks = mappedChildTasks;
+
+            return ResponseFormater.OK(mappedTask);
         }
 
         private async System.Threading.Tasks.Task CheckParentTaskIdValid(TaskCreateUpdateDTO taskCreateUpdateDTO)
