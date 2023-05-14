@@ -1,8 +1,11 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TaskManager.Api.Enums;
 using TaskManager.Api.Managers.Interfaces;
 using TaskManager.Api.Models.DTOs;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace TaskManager.Api.Controllers
 {
@@ -49,12 +52,9 @@ namespace TaskManager.Api.Controllers
             try
             {
                 //TODO: FIX
-                HttpContext.Session.Clear();
+                var response = await _accountManager.LogOut();
 
-                return Ok(new ResponseDTO<bool>
-                {
-                    Data = true
-                });
+                return Ok(response);
             }
             catch (Exception ex)
             {

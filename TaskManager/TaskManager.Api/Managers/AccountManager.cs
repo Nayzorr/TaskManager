@@ -12,11 +12,13 @@ namespace TaskManager.Api.Managers
     {
         private readonly IDBAccessor _dbAccessor;
         private readonly IMapper _mapper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AccountManager(IDBAccessor dBAccessor, IMapper mapper)
+        public AccountManager(IDBAccessor dBAccessor, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             _dbAccessor = dBAccessor;
             _mapper = mapper;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<ResponseDTO<bool>> ChangeFriendStatus(int currentUserId, UserFriendStatusDTO userFriendDTO)
@@ -44,7 +46,16 @@ namespace TaskManager.Api.Managers
 
             var token = AccountHelper.GenerateToken(currentUser);
 
+            var cookieHelper = new CookieHelper(_httpContextAccessor);
+            cookieHelper.SetCookie("jwtToken", token, EnvironmentVariables.TokenLifeTimeInMinutes);
             return ResponseFormater.OK(token);
+        }
+
+        public async Task<ResponseDTO<bool>>  LogOut()
+        {
+            var cookieHelper = new CookieHelper(_httpContextAccessor);
+            cookieHelper.RemoveCookie("jwtToken");
+            return ResponseFormater.OK(true);
         }
 
         public async Task<ResponseDTO<bool>> ChangeUserPassword(int currentUserId, string password)
