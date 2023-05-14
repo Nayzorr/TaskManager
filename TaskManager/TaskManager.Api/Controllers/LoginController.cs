@@ -1,11 +1,7 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TaskManager.Api.Enums;
 using TaskManager.Api.Managers.Interfaces;
 using TaskManager.Api.Models.DTOs;
-using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace TaskManager.Api.Controllers
 {
