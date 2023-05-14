@@ -198,7 +198,7 @@ namespace TaskManager.Api.Controllers
         }
 
 
-        [HttpPost("DeleteUserFromTheTeam/{userToDeleteId}")]
+        [HttpDelete("DeleteUserFromTheTeam/{userToDeleteId}/{teamName}")]
         [Authorize]
         public async Task<IActionResult> DeleteUserFromTheTeam(int userToDeleteId, string teamName)
         {

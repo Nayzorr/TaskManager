@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Runtime.Intrinsics.X86;
+using System;
 using System.Threading.Tasks;
 using TaskManager.Api.Accessors.Interfaces;
 using TaskManager.Api.DO;
@@ -457,6 +459,54 @@ namespace TaskManager.Api.Accessors
 
         }
 
+        public async Task<List<DO.Task>> GetTasksFullInfokByUserIdAsync(int userId, DateTime? scheduledDateFrom, DateTime? scheduledDateTo)
+        {
+            using var context = new TaskManagerContext(_rapaportConnectionString);
+
+            var query = context.Tasks
+                .Include(e => e.TaskStatus)
+                .Include(e => e.TaskPriority)
+                .Include(e => e.TaskAssignments)
+                .Where(e => e.TaskAssignments.Any(a => a.UserId == userId));
+
+            if (scheduledDateFrom != null)
+            {
+                query = query.Where(e => e.DateScheduled >= scheduledDateFrom.Value);
+            }
+
+            if (scheduledDateTo != null)
+            {
+                query = query.Where(e => e.DateScheduled <= scheduledDateTo.Value);
+            }
+
+            var tasks = await query.ToListAsync();
+            return tasks;
+        }
+
+        public async Task<List<DO.Task>> GetTasksFullInfokByTeamIdAsync(int teamId, DateTime? scheduledDateFrom, DateTime? scheduledDateTo)
+        {
+            using var context = new TaskManagerContext(_rapaportConnectionString);
+
+            var query = context.Tasks
+                .Include(e => e.TaskStatus)
+                .Include(e => e.TaskPriority)
+                .Include(e => e.TaskAssignments)
+                .Where(e => e.TaskAssignments.Any(a => a.TeamId == teamId));
+
+            if (scheduledDateFrom != null)
+            {
+                query = query.Where(e => e.DateScheduled >= scheduledDateFrom.Value);
+            }
+
+            if (scheduledDateTo != null)
+            {
+                query = query.Where(e => e.DateScheduled <= scheduledDateTo.Value);
+            }
+
+            var tasks = await query.ToListAsync();
+            return tasks;
+        }
+
         #endregion
 
         #region Account
@@ -464,11 +514,9 @@ namespace TaskManager.Api.Accessors
         public async Task<bool> ChangeFriendStatusAsync(int currentUserId, int userIdToChangeStatus, FriendStatusEnum friendStatus)
         {
             using var context = new TaskManagerContext(_rapaportConnectionString);
-
             var currentState = await context.Friends
-                .SingleOrDefaultAsync(e => (e.UserFirstId == currentUserId && e.UserSecondId == userIdToChangeStatus) ||
-                (e.UserSecondId == currentUserId && e.UserFirstId == userIdToChangeStatus));
-
+            .SingleOrDefaultAsync(e => (e.UserFirstId == currentUserId && e.UserSecondId == userIdToChangeStatus) ||
+            (e.UserSecondId == currentUserId && e.UserFirstId == userIdToChangeStatus));
             if (currentState is null && friendStatus != FriendStatusEnum.Pending)
             {
                 return false;

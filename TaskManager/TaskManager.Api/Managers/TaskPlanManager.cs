@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using TaskManager.Api.Accessors.Interfaces;
+using TaskManager.Api.DO;
 using TaskManager.Api.Managers.Interfaces;
 using TaskManager.Api.Models.DTOs;
 
@@ -79,6 +80,48 @@ namespace TaskManager.Api.Managers
             mappedTask.SubTasks = mappedChildTasks;
 
             return ResponseFormater.OK(mappedTask);
+        }
+
+        public async Task<ResponseDTO<List<TaskDTO>>> GetTeamTasksAsync(int teamId, DateTime? scheduledDateFrom, DateTime? scheduledDateTo)
+        {
+            var teamTasks = await _dbAccessor.GetTasksFullInfokByTeamIdAsync(teamId, scheduledDateFrom, scheduledDateTo);
+
+            if (teamTasks is null)
+            {
+                throw new Exception("Tasks don't exists");
+            }
+
+            var mappedTasks = _mapper.Map<List<TaskDTO>>(teamTasks);
+
+            foreach (var mappedTask in mappedTasks)
+            {
+                var childTasks = await _dbAccessor.GetChildTasksFullInfoByTaskIdAsync(mappedTask.Id);
+                var mappedChildTasks = _mapper.Map<List<TaskDTO>>(childTasks);
+                mappedTask.SubTasks = mappedChildTasks;
+            }
+
+            return ResponseFormater.OK(mappedTasks);
+        }
+
+        public async Task<ResponseDTO<List<TaskDTO>>> GetUserTasksAsync(int userId, DateTime? scheduledDateFrom, DateTime? scheduledDateTo)
+        {
+            var userTasks = await _dbAccessor.GetTasksFullInfokByUserIdAsync(userId, scheduledDateFrom, scheduledDateTo);
+
+            if (userTasks is null)
+            {
+                throw new Exception("Tasks don't exists");
+            }
+
+            var mappedTasks = _mapper.Map<List<TaskDTO>>(userTasks);
+
+            foreach (var mappedTask in mappedTasks)
+            {
+                var childTasks = await _dbAccessor.GetChildTasksFullInfoByTaskIdAsync(mappedTask.Id);
+                var mappedChildTasks = _mapper.Map<List<TaskDTO>>(childTasks);
+                mappedTask.SubTasks = mappedChildTasks;
+            }          
+
+            return ResponseFormater.OK(mappedTasks);
         }
 
         private async System.Threading.Tasks.Task CheckParentTaskIdValid(TaskCreateUpdateDTO taskCreateUpdateDTO)

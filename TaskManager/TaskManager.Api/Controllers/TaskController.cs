@@ -84,5 +84,45 @@ namespace TaskManager.Api.Controllers
                 return BadRequest(ResponseFormater.Error(ErrorCodes.InternalServerException));
             }
         }
+
+        [HttpGet("GetUserTasks/{userId}")]
+        [Authorize]
+        public async Task<IActionResult> GetUserTasksAsync(int userId, DateTime? scheduledDateFrom, DateTime? scheduledDateTo)
+        {
+            try
+            {
+                if (HttpContext.User.Identity is ClaimsIdentity identity)
+                {
+                    var result = await _taskPlanManager.GetUserTasksAsync(userId, scheduledDateFrom, scheduledDateTo);
+                    return Ok(result);
+                }
+
+                return BadRequest(ResponseFormater.Error(ErrorCodes.EntityNotFound));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ResponseFormater.Error(ErrorCodes.InternalServerException));
+            }
+        }
+
+        [HttpGet("GetTeamTasks/{teamId}")]
+        [Authorize]
+        public async Task<IActionResult> GetTeamTasksAsync(int teamId, DateTime? scheduledDateFrom, DateTime? scheduledDateTo)
+        {
+            try
+            {
+                if (HttpContext.User.Identity is ClaimsIdentity identity)
+                {
+                    var result = await _taskPlanManager.GetTeamTasksAsync(teamId, scheduledDateFrom, scheduledDateTo);
+                    return Ok(result);
+                }
+
+                return BadRequest(ResponseFormater.Error(ErrorCodes.EntityNotFound));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ResponseFormater.Error(ErrorCodes.InternalServerException));
+            }
+        }
     }
 }

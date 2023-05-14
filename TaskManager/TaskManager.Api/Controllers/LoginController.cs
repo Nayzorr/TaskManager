@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TaskManager.Api.Enums;
 using TaskManager.Api.Managers.Interfaces;
@@ -12,7 +13,7 @@ namespace TaskManager.Api.Controllers
         private readonly IAccountManager _accountManager;
         private readonly ILogger<LoginController> _logger;
 
-        public LoginController(ILogger<LoginController> logger, IAccountManager accountManager)
+        public LoginController(ILogger<LoginController> logger, IAccountManager accountManager, IHttpContextAccessor httpContextAccessor)
         {
             _accountManager = accountManager;
             _logger = logger;
@@ -33,6 +34,27 @@ namespace TaskManager.Api.Controllers
                 var token = await _accountManager.Authentificate(userLogin);
 
                 return Ok(token);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message, ex);
+                return BadRequest(ResponseFormater.Error(ex, ErrorCodes.InternalServerException));
+            }
+        }
+
+        [HttpPost("Logout")]
+        public async Task<IActionResult> Logout()
+        {
+
+            try
+            {
+                //TODO: FIX
+                HttpContext.Session.Clear();
+
+                return Ok(new ResponseDTO<bool>
+                {
+                    Data = true
+                });
             }
             catch (Exception ex)
             {
