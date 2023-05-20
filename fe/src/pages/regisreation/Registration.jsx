@@ -31,7 +31,7 @@ export default function Registration() {
     });
 
     let user = API.post(REGISTRATION, {
-          id: 1,
+          id: 0,
           userName: data.get('userName'),
           password: data.get('password'),
           email: data.get('email'),
