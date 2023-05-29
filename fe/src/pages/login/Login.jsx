@@ -73,7 +73,7 @@ export default function Login() {
         setIsCorrectUser(false);
       })
       .catch((erorr) => {
-        if (erorr.response.status == 400) {
+        if (erorr.response.status === 400) {
           setIsCorrectUser(true);
         }
       });
