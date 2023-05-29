@@ -87,13 +87,13 @@ namespace TaskManager.Api.Controllers
 
         [HttpGet("GetUserTasks/{userId}")]
         [Authorize]
-        public async Task<IActionResult> GetUserTasksAsync(int userId, DateTime? scheduledDateFrom, DateTime? scheduledDateTo)
+        public async Task<IActionResult> GetUserTasksAsync(int userId, DateTime? scheduledDateFrom, DateTime? scheduledDateTo, int? taskPriorityId, int? taskStatusId)
         {
             try
             {
                 if (HttpContext.User.Identity is ClaimsIdentity identity)
                 {
-                    var result = await _taskPlanManager.GetUserTasksAsync(userId, scheduledDateFrom, scheduledDateTo);
+                    var result = await _taskPlanManager.GetUserTasksAsync(userId, scheduledDateFrom, scheduledDateTo, taskPriorityId, taskStatusId);
                     return Ok(result);
                 }
 
@@ -107,13 +107,13 @@ namespace TaskManager.Api.Controllers
 
         [HttpGet("GetTeamTasks/{teamId}")]
         [Authorize]
-        public async Task<IActionResult> GetTeamTasksAsync(int teamId, DateTime? scheduledDateFrom, DateTime? scheduledDateTo)
+        public async Task<IActionResult> GetTeamTasksAsync(int teamId, DateTime? scheduledDateFrom, DateTime? scheduledDateTo, int? taskPriorityId, int? taskStatusId)
         {
             try
             {
                 if (HttpContext.User.Identity is ClaimsIdentity identity)
                 {
-                    var result = await _taskPlanManager.GetTeamTasksAsync(teamId, scheduledDateFrom, scheduledDateTo);
+                    var result = await _taskPlanManager.GetTeamTasksAsync(teamId, scheduledDateFrom, scheduledDateTo, taskPriorityId, taskStatusId);
                     return Ok(result);
                 }
 

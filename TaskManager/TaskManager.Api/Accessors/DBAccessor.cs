@@ -154,7 +154,19 @@ namespace TaskManager.Api.Accessors
                 throw new Exception("Team Name '" + teamToCreate.TeamName + "' is already taken");
             }
 
+           
             await context.Teams.AddAsync(teamToCreate);
+            await context.SaveChangesAsync();
+
+            int newTaskId = teamToCreate.Id;
+
+            UserTeam userTeamToCreate = new UserTeam()
+            {
+                TeamId = newTaskId,
+                UserId = teamToCreate.CreatorId
+            };
+
+            await context.UserTeams.AddAsync(userTeamToCreate);
             await context.SaveChangesAsync();
             return true;
         }
@@ -459,7 +471,7 @@ namespace TaskManager.Api.Accessors
 
         }
 
-        public async Task<List<DO.Task>> GetTasksFullInfokByUserIdAsync(int userId, DateTime? scheduledDateFrom, DateTime? scheduledDateTo)
+        public async Task<List<DO.Task>> GetTasksFullInfokByUserIdAsync(int userId, DateTime? scheduledDateFrom, DateTime? scheduledDateTo, int? taskPriorityId, int? taskStatusId)
         {
             using var context = new TaskManagerContext(_rapaportConnectionString);
 
@@ -479,11 +491,21 @@ namespace TaskManager.Api.Accessors
                 query = query.Where(e => e.DateScheduled <= scheduledDateTo.Value);
             }
 
+            if (taskPriorityId != null)
+            {
+                query = query.Where(e => e.TaskPriorityId == taskPriorityId.Value);
+            }
+
+            if (taskStatusId != null)
+            {
+                query = query.Where(e => e.TaskStatusId == taskStatusId.Value);
+            }
+
             var tasks = await query.ToListAsync();
             return tasks;
         }
 
-        public async Task<List<DO.Task>> GetTasksFullInfokByTeamIdAsync(int teamId, DateTime? scheduledDateFrom, DateTime? scheduledDateTo)
+        public async Task<List<DO.Task>> GetTasksFullInfokByTeamIdAsync(int teamId, DateTime? scheduledDateFrom, DateTime? scheduledDateTo, int? taskPriorityId, int? taskStatusId)
         {
             using var context = new TaskManagerContext(_rapaportConnectionString);
 
@@ -501,6 +523,16 @@ namespace TaskManager.Api.Accessors
             if (scheduledDateTo != null)
             {
                 query = query.Where(e => e.DateScheduled <= scheduledDateTo.Value);
+            }
+
+            if (taskPriorityId != null)
+            {
+                query = query.Where(e => e.TaskPriorityId == taskPriorityId.Value);
+            }
+
+            if (taskStatusId != null)
+            {
+                query = query.Where(e => e.TaskStatusId == taskStatusId.Value);
             }
 
             var tasks = await query.ToListAsync();

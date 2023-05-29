@@ -7,7 +7,7 @@ namespace TaskManager.Api.Managers.Interfaces
         Task<ResponseDTO<bool>> CreateUpdateTaskAsync(TaskCreateUpdateDTO taskCreateUpdateDTO, int currentUserId);
         Task<ResponseDTO<bool>> DeleteTaskAsync(int currentUserId, int taskId);
         Task<ResponseDTO<TaskDTO>> GetTaskById(int currentUserId, int taskId);
-        Task<ResponseDTO<List<TaskDTO>>> GetTeamTasksAsync(int teamId, DateTime? scheduledDateFrom, DateTime? scheduledDateTo);
-        Task<ResponseDTO<List<TaskDTO>>> GetUserTasksAsync(int userId, DateTime? scheduledDateFrom, DateTime? scheduledDateTo);
+        Task<ResponseDTO<List<TaskDTO>>> GetTeamTasksAsync(int teamId, DateTime? scheduledDateFrom, DateTime? scheduledDateTo, int? taskPriorityId, int? taskStatusId);
+        Task<ResponseDTO<List<TaskDTO>>> GetUserTasksAsync(int userId, DateTime? scheduledDateFrom, DateTime? scheduledDateTo, int? taskPriorityId, int? taskStatusId);
     }
 }

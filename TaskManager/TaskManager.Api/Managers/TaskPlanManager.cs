@@ -82,9 +82,9 @@ namespace TaskManager.Api.Managers
             return ResponseFormater.OK(mappedTask);
         }
 
-        public async Task<ResponseDTO<List<TaskDTO>>> GetTeamTasksAsync(int teamId, DateTime? scheduledDateFrom, DateTime? scheduledDateTo)
+        public async Task<ResponseDTO<List<TaskDTO>>> GetTeamTasksAsync(int teamId, DateTime? scheduledDateFrom, DateTime? scheduledDateTo, int? taskPriorityId, int? taskStatusId)
         {
-            var teamTasks = await _dbAccessor.GetTasksFullInfokByTeamIdAsync(teamId, scheduledDateFrom, scheduledDateTo);
+            var teamTasks = await _dbAccessor.GetTasksFullInfokByTeamIdAsync(teamId, scheduledDateFrom, scheduledDateTo, taskPriorityId, taskStatusId);
 
             if (teamTasks is null)
             {
@@ -103,9 +103,9 @@ namespace TaskManager.Api.Managers
             return ResponseFormater.OK(mappedTasks);
         }
 
-        public async Task<ResponseDTO<List<TaskDTO>>> GetUserTasksAsync(int userId, DateTime? scheduledDateFrom, DateTime? scheduledDateTo)
+        public async Task<ResponseDTO<List<TaskDTO>>> GetUserTasksAsync(int userId, DateTime? scheduledDateFrom, DateTime? scheduledDateTo, int? taskPriorityId, int? taskStatusId)
         {
-            var userTasks = await _dbAccessor.GetTasksFullInfokByUserIdAsync(userId, scheduledDateFrom, scheduledDateTo);
+            var userTasks = await _dbAccessor.GetTasksFullInfokByUserIdAsync(userId, scheduledDateFrom, scheduledDateTo, taskPriorityId, taskStatusId);
 
             if (userTasks is null)
             {
