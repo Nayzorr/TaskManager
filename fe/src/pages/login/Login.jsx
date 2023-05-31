@@ -17,6 +17,7 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import styles from "./Login.module.css";
 import API from "../../api/axios";
 import { AUTHENTICATE } from "../../api/url";
+import { useNavigate } from "react-router-dom";
 
 const theme = createTheme({
   components: {
@@ -57,6 +58,7 @@ const theme = createTheme({
 });
 
 export default function Login() {
+  const navigate = useNavigate();
   const [userLogin, setUserLogin] = useState({
     userName: "",
     password: "",
@@ -70,11 +72,17 @@ export default function Login() {
     })
       .then((response) => {
         console.log(response.data.data);
-        setIsCorrectUser(false);
+        setIsCorrectUser(true);
+        navigate("/dashboard");
+        console.log(response);
+        console.log(response.data.data);
+        const accessToken = response.data.data;
+        API.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+        console.log(`Bearer ${accessToken}`);
       })
       .catch((erorr) => {
         if (erorr.response.status === 400) {
-          setIsCorrectUser(true);
+          setIsCorrectUser(false);
         }
       });
   };

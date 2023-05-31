@@ -8,16 +8,17 @@ import GroupWorkIcon from '@mui/icons-material/GroupWork';
 import TaskIcon from '@mui/icons-material/Task';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import LogoutIcon from '@mui/icons-material/Logout';
+import { Link } from 'react-router-dom';
 
 export const mainListItems = (
   <React.Fragment>
-    <ListItemButton>
+    <ListItemButton component={Link} to="/dashboard/user">
       <ListItemIcon>
         <PersonIcon  />
       </ListItemIcon>
       <ListItemText primary="User" />
     </ListItemButton>
-    <ListItemButton>
+    <ListItemButton component={Link} to="/dashboard/friends">
       <ListItemIcon>
       <PeopleIcon />
       </ListItemIcon>
@@ -29,7 +30,7 @@ export const mainListItems = (
       </ListItemIcon>
       <ListItemText primary="Teams" />
     </ListItemButton>
-    <ListItemButton>
+    <ListItemButton component={Link} to="/dashboard/tasks">
       <ListItemIcon>
         <TaskIcon />
       </ListItemIcon>
