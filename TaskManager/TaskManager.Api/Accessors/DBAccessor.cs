@@ -154,7 +154,7 @@ namespace TaskManager.Api.Accessors
                 throw new Exception("Team Name '" + teamToCreate.TeamName + "' is already taken");
             }
 
-           
+
             await context.Teams.AddAsync(teamToCreate);
             await context.SaveChangesAsync();
 
@@ -695,6 +695,28 @@ namespace TaskManager.Api.Accessors
             var teamInvtitations = await context.TeamInvitations.Where(e => e.UserToInviteId == userId).ToListAsync();
 
             return teamInvtitations;
+        }
+
+        public async Task<List<User>> GetPendingFriendsLists(int userId)
+        {
+            using var context = new TaskManagerContext(_rapaportConnectionString);
+
+            var friendIds = await context.Friends
+                .Where(fr => fr.FriendStatusId == (int)FriendStatusEnum.Pending && (fr.UserFirstId == userId || fr.UserSecondId == userId))
+                .Select(fr => fr.UserFirstId == userId ? fr.UserSecondId : fr.UserFirstId)
+                .ToListAsync();
+
+            return await context.Users
+                    .Where(u => friendIds.Contains(u.Id))
+                    .ToListAsync();
+        }
+
+        public async Task<List<User>> SearchUsersByUserName(string searchString)
+        {
+            using var context = new TaskManagerContext(_rapaportConnectionString);
+
+            return await context.Users
+                .Where(e => e.UserName.StartsWith(searchString)).ToListAsync();
         }
 
         #endregion

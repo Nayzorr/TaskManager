@@ -35,5 +35,7 @@ namespace TaskManager.Api.Accessors.Interfaces
         Task<List<DO.Task>> GetChildTasksFullInfoByTaskIdAsync(int? taskId);
         Task<List<DO.Task>> GetTasksFullInfokByUserIdAsync(int userId, DateTime? scheduledDateFrom, DateTime? scheduledDateTo, int? taskPriorityId, int? taskStatusId);
         Task<List<DO.Task>> GetTasksFullInfokByTeamIdAsync(int teamId, DateTime? scheduledDateFrom, DateTime? scheduledDateTo, int? taskPriorityId, int? taskStatusId);
+        Task<List<User>> GetPendingFriendsLists(int userId);
+        Task<List<User>> SearchUsersByUserName(string searchString);
     }
 }

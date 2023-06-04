@@ -113,5 +113,23 @@ namespace TaskManager.Api.Managers
 
             return ResponseFormater.OK(result);
         }
+
+        public async Task<ResponseDTO<List<BaseUserDTO>>> GetPendingFriendsLists(int userId)
+        {
+            var dbUserPendingFriendsList = await _dbAccessor.GetPendingFriendsLists(userId);
+
+            var mappedUserPendingFriendsList = _mapper.Map<List<BaseUserDTO>>(dbUserPendingFriendsList);
+
+            return ResponseFormater.OK(mappedUserPendingFriendsList);
+        }
+
+        public async Task<ResponseDTO<List<BaseUserDTO>>> SearchUsersByUserName(string stringToSearch)
+        {
+            var dbFoundUsersList = await _dbAccessor.SearchUsersByUserName(stringToSearch);
+
+            var mappedFoundUsersList = _mapper.Map<List<BaseUserDTO>>(dbFoundUsersList);
+
+            return ResponseFormater.OK(mappedFoundUsersList);
+        }
     }
 }

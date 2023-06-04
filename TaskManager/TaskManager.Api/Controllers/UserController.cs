@@ -139,5 +139,47 @@ namespace TaskManager.Api.Controllers
                 return BadRequest(ResponseFormater.Error(ErrorCodes.InternalServerException));
             }
         }
+
+        [HttpGet("GetPendingFriendsLists")]
+        [Authorize]
+        public async Task<IActionResult> GetPendingFriendsLists()
+        {
+            try
+            {
+                if (HttpContext.User.Identity is ClaimsIdentity identity)
+                {
+                    int userId = int.Parse(identity?.Claims.FirstOrDefault(e => e.Type == ClaimTypes.NameIdentifier)?.Value);
+                    var userFriendsList = await _accountManager.GetPendingFriendsLists(userId);
+                    return Ok(userFriendsList);
+                }
+
+                return BadRequest(ResponseFormater.Error(ErrorCodes.EntityNotFound));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ResponseFormater.Error(ErrorCodes.InternalServerException));
+            }
+        }
+
+        [HttpGet("SearchUsersByUserName")]
+        [Authorize]
+        public async Task<IActionResult> SearchUsersByUserName(string stringToSearch)
+        {
+            try
+            {
+                if (HttpContext.User.Identity is ClaimsIdentity identity)
+                {
+                    int userId = int.Parse(identity?.Claims.FirstOrDefault(e => e.Type == ClaimTypes.NameIdentifier)?.Value);
+                    var foundusers = await _accountManager.SearchUsersByUserName(stringToSearch);
+                    return Ok(foundusers);
+                }
+
+                return BadRequest(ResponseFormater.Error(ErrorCodes.EntityNotFound));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ResponseFormater.Error(ErrorCodes.InternalServerException));
+            }
+        }
     }
 }

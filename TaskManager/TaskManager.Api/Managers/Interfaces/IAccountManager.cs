@@ -12,5 +12,7 @@ namespace TaskManager.Api.Managers.Interfaces
         Task<ResponseDTO<List<BaseUserDTO>>> GetUserFriendsList(int userId);
         Task<ResponseDTO<bool>> ChangeUserMainInfo(BaseUserDTO userDTO);
         Task<ResponseDTO<bool>> LogOut();
+        Task<ResponseDTO<List<BaseUserDTO>>> GetPendingFriendsLists(int userId);
+        Task<ResponseDTO<List<BaseUserDTO>>> SearchUsersByUserName(string stringToSearch);
     }
 }
