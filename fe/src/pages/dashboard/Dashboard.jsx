@@ -11,15 +11,11 @@ import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import Badge from "@mui/material/Badge";
 import Container from "@mui/material/Container";
-import Grid from "@mui/material/Grid";
-import Paper from "@mui/material/Paper";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import { mainListItems, secondaryListItems } from "./listItems";
-import User from "../../component/user/User";
-import { BrowserRouter, Outlet, Route, Routes, useNavigate } from "react-router-dom";
-import Friend from "../../component/friend/Friend";
+import { Outlet } from "react-router-dom";
 
 const drawerWidth = 240;
 
@@ -75,13 +71,6 @@ export default function Dashboard() {
   const toggleDrawer = () => {
     setOpen(!open);
   };
-
-  // const token = "dfh";
-  // useEffect(() => {
-  //   if (!token) {
-  //     navigate("route");
-  //   }
-  // }, []);
 
   return (
     <ThemeProvider theme={defaultTheme}>

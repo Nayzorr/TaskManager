@@ -18,6 +18,8 @@ import styles from "./Login.module.css";
 import API from "../../api/axios";
 import { AUTHENTICATE } from "../../api/url";
 import { useNavigate } from "react-router-dom";
+import { useCookies } from 'react-cookie';
+import UseAuth from "../../hooks/UseAuth";
 
 const theme = createTheme({
   components: {
@@ -64,6 +66,8 @@ export default function Login() {
     password: "",
   });
   const [isCorrectUser, setIsCorrectUser] = useState(false);
+  const [cookies, setCookie] = useCookies(['accessToken']);
+  const { setAuth } = UseAuth();
 
   const login = () => {
     let user = API.post(AUTHENTICATE, {
@@ -74,11 +78,11 @@ export default function Login() {
         console.log(response.data.data);
         setIsCorrectUser(true);
         navigate("/dashboard");
-        console.log(response);
-        console.log(response.data.data);
         const accessToken = response.data.data;
         API.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-        console.log(`Bearer ${accessToken}`);
+        setCookie('accessToken', accessToken, { path: '/' });
+        console.log(accessToken);
+        setAuth({accessToken})
       })
       .catch((erorr) => {
         if (erorr.response.status === 400) {

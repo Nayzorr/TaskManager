@@ -1,13 +1,32 @@
 import Login from "./pages/login/Login";
-import "./App.css";
-import Registration from "./pages/regisreation/Registration";
 import Dashboard from "./pages/dashboard/Dashboard";
-import { createBrowserRouter } from "react-router-dom";
+import User from "./component/user/User";
+import Friend from "./component/friend/Friend";
+import Task from "./component/task/Task";
+import Registration from "./pages/regisreation/Registration"
+import "./App.css";
+import { CookiesProvider } from "react-cookie";
+import { Route, Routes } from "react-router-dom";
+import RequiredAuth from "./component/auth/RequiredAuth";
+import Grid from "./component/friend/Grid";
 
 function App() {
   return (
     <div className="App">
-      <Login />
+      <CookiesProvider>
+        <Routes>
+          <Route path="login" element={<Login />} />
+          <Route path="registration" element={<Registration />} />
+          <Route element={<RequiredAuth />}>
+            <Route path="dashboard" element={<Dashboard />}>
+              <Route path="user" element={<User />} />
+              <Route path="friends" element={<Friend />} />
+              <Route path="tasks" element={<Task />} />
+              <Route element={<Grid />} />
+            </Route>
+          </Route>
+        </Routes>
+      </CookiesProvider>
     </div>
   );
 }
