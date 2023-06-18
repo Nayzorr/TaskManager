@@ -24,7 +24,7 @@ export const mainListItems = (
       </ListItemIcon>
       <ListItemText primary="Friends" />
     </ListItemButton>
-    <ListItemButton>
+    <ListItemButton component={Link} to="/dashboard/team">
       <ListItemIcon>
         <GroupWorkIcon  />
       </ListItemIcon>
@@ -36,11 +36,11 @@ export const mainListItems = (
       </ListItemIcon>
       <ListItemText primary="Tasks" />
     </ListItemButton>
-    <ListItemButton>
+    <ListItemButton component={Link} to="/dashboard/calendarComponent">
       <ListItemIcon>
         <CalendarMonthIcon />
       </ListItemIcon>
-      <ListItemText primary="Calendar" />
+      <ListItemText primary="Calendar"/>
     </ListItemButton>
   </React.Fragment>
 );

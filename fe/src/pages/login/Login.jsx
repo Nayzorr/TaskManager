@@ -75,13 +75,11 @@ export default function Login() {
       password: userLogin.password,
     })
       .then((response) => {
-        console.log(response.data.data);
         setIsCorrectUser(true);
         navigate("/dashboard");
         const accessToken = response.data.data;
         API.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
         setCookie('accessToken', accessToken, { path: '/' });
-        console.log(accessToken);
         setAuth({accessToken})
       })
       .catch((erorr) => {

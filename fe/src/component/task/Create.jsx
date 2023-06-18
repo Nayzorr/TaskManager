@@ -1,6 +1,8 @@
 import { Button, Container, TextField, ThemeProvider, createTheme } from "@mui/material";
 import styles from "./Task.module.css";
 import { useState } from "react";
+import API from "../../api/axios";
+import { CREATE_TASK } from "../../api/url";
 
 const theme = createTheme({
     components: {
@@ -22,7 +24,7 @@ export default function Create(){
         name: '',
         dateCreated: '',
         dateScheduled: '',
-        parentId: '',
+        parentId: null,
         description: '',
       });
     
@@ -39,8 +41,17 @@ export default function Create(){
         // Perform POST request with taskData
         console.log(taskData);
         // Reset form fields
+        taskData.id = 0;
+        API.post(CREATE_TASK, taskData)
+        .then((response) => {
+          console.log(response.data.data);
+        })
+        .catch((erorr) => {
+          if (erorr.response.status === 400) {
+          }
+        });
         setTaskData({
-          id: '',
+          id: 0,
           taskPriorityId: '',
           taskStatusId: '',
           name: '',
@@ -56,14 +67,14 @@ export default function Create(){
         <Container>
           <form className={styles.form} onSubmit={handleSubmit}>
             <TextField
-              label="Task Priority ID"
+              label="Task Priority"
               name="taskPriorityId"
               value={taskData.taskPriorityId}
               onChange={handleChange}
               required
             />
             <TextField
-              label="Task Status ID"
+              label="Task Status"
               name="taskStatusId"
               value={taskData.taskStatusId}
               onChange={handleChange}
@@ -99,11 +110,10 @@ export default function Create(){
               }}
             />
             <TextField
-              label="Parent ID"
+              label="Parent"
               name="parentId"
               value={taskData.parentId}
               onChange={handleChange}
-              required
             />
             <TextField
               label="Description"
@@ -112,7 +122,6 @@ export default function Create(){
               rows={4}
               value={taskData.description}
               onChange={handleChange}
-              required
             />
             <Button
               variant="contained"
